@@ -1,14 +1,14 @@
-# Acuity Kinetic
+# wobbl
 
-Your camera watches how you move and tells you what to fix.
+wobbl catches the wobble in your form and tells you what to fix.
 
-Acuity Kinetic tracks your body (and hands, for music) in the browser, measures joint angles on every frame, checks each rep or held position against rules for that drill, and says one correction out loud when the same mistake keeps showing up.
+(Formerly Acuity Kinetic.) wobbl tracks your body (and hands, for music) in the browser, measures joint angles on every frame, checks each rep or held position against rules for that drill, and says one correction out loud when the same mistake keeps showing up.
 
 | Product | Status | Drills |
 | --- | --- | --- |
-| Sport | Beta | Squat, jump shot, Tae Kwon Do front stance, AI coach for any other sport |
-| Music | Early access | Piano hand position, guitar fretting hand |
-| Posture | Early access | Sitting at a desk |
+| wobbl for sport | Beta | Squat, jump shot, Tae Kwon Do front stance, AI coach for any other sport |
+| wobbl for music | Early access | Piano hand position, guitar fretting hand |
+| wobbl for posture | Early access | Sitting at a desk |
 
 ## How it works
 
@@ -41,7 +41,7 @@ src/engine/        pure logic, no DOM: runs the same in the browser and in tests
 src/drills/        one file per product; each drill is data plus small measure/fault functions
 src/tracking/      MediaPipe wrapper, overlay drawing, frame buffer for the AI coach
 src/app/           the app at /try/: picker, setup, live view, report, session runner
-src/components/    the marketing site
+src/components/    the marketing site, including the wobbl mascot (Wobbl.jsx)
 api/coach.js       server function for the AI coach (holds the Gemini key)
 test/              unit and coaching tests on synthetic poses with known angles
 ```
@@ -77,7 +77,7 @@ npm run dev            # site at http://localhost:5173, app at http://localhost:
 npm test               # engine and coaching tests
 ```
 
-Use Chrome. The first session takes a few seconds while the tracking models download.
+Use Chrome. The first session takes a few seconds while the tracking models download. Fonts (Inter, Caveat, Geist Mono) are bundled, so nothing loads from Google Fonts.
 
 ## Environment variables
 
@@ -103,4 +103,4 @@ On Vercel:
 - Thresholds are starting points, not values validated with coaches yet. Tune them in `src/drills/` as real sessions come in.
 - The real tracking path (camera plus MediaPipe models) has to be checked on a real device. The tests cover everything after the tracker.
 
-© 2026 Acuity Kinetic
+© 2026 wobbl

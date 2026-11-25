@@ -16,8 +16,9 @@ export default {
         'accent-ink': '#007A3D', // accent when it has to sit on paper as text
       },
       fontFamily: {
-        sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        sans: ['"Inter Variable"', 'Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
         mono: ['"Geist Mono"', 'ui-monospace', 'SFMono-Regular', 'monospace'],
+        hand: ['Caveat', 'ui-rounded', 'cursive'], // handwritten notes only
       },
       fontSize: {
         hero: ['clamp(3rem, 8.2vw, 5.5rem)', { lineHeight: '0.95', letterSpacing: '-0.045em' }],

@@ -2,19 +2,19 @@ import WindowBar from './WindowBar.jsx';
 
 const STEPS = [
   {
-    title: 'Track',
+    title: 'track',
     body: "MediaPipe's pose model finds 33 points on your body, plus 21 on each hand for music, up to 30 times a second. It runs on your device.",
   },
   {
-    title: 'Measure',
+    title: 'measure',
     body: "Those points become 3D joint angles, stance length, wrist height and so on. A smoothing filter takes out the jitter so one shaky frame doesn't set anything off.",
   },
   {
-    title: 'Check',
+    title: 'check',
     body: 'Each drill has rules with targets. A squat needs your knee under 100° at the bottom, for example. Every rep gets a score out of 100.',
   },
   {
-    title: 'Speak',
+    title: 'speak',
     body: "It says one thing at a time, and only after the same mistake shows up in two of your last three reps. It won't repeat a cue for at least 15 seconds, and it tells you when you've fixed it.",
   },
 ];
@@ -32,7 +32,7 @@ export default function HowItWorks() {
     <section id="how-it-works" className="px-5 py-20 sm:px-8 sm:py-28">
       <div className="mx-auto grid max-w-page grid-cols-[minmax(0,1fr)] gap-14 lg:grid-cols-2 lg:gap-16">
         <div>
-          <h2 className="text-section font-semibold">What happens on every frame</h2>
+          <h2 className="text-section font-semibold">what happens on every frame</h2>
           <ol className="mt-10 space-y-8">
             {STEPS.map((step, i) => (
               <li key={step.title} className="grid grid-cols-[2.25rem_1fr] gap-x-4">
@@ -50,7 +50,7 @@ export default function HowItWorks() {
 
         <div className="lg:pt-24">
           <div className="window">
-            <WindowBar title="Session report (example)" />
+            <WindowBar title="session report (example)" />
             <div className="p-6">
               <p className="text-[14px] text-muted">Squat</p>
               <p className="mt-1 text-3xl font-semibold tracking-tight">8 reps, averaging 74.</p>

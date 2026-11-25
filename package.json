@@ -1,5 +1,5 @@
 {
-  "name": "acuity-kinetic",
+  "name": "wobbl",
   "private": true,
   "version": "1.0.0",
   "type": "module",
@@ -10,6 +10,9 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@fontsource-variable/inter": "^5.3.0",
+    "@fontsource/caveat": "^5.3.0",
+    "@fontsource/geist-mono": "^5.3.0",
     "@mediapipe/tasks-vision": "^0.10.35",
     "framer-motion": "^11.11.7",
     "lucide-react": "^0.451.0",

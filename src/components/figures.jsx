@@ -31,7 +31,7 @@ export function Ring({ at, label }) {
     <g>
       <circle cx={at[0]} cy={at[1]} r="14" fill="#FF453A" fillOpacity="0.12" stroke="#FF453A" strokeWidth="2" />
       {label && (
-        <text x={at[0] + 20} y={at[1] - 14} fill="#FFFFFF" fontSize="12" fontFamily="Inter, sans-serif">
+        <text x={at[0] + 20} y={at[1] - 14} fill="#FFFFFF" fontSize="12" fontFamily="'Inter Variable', Inter, sans-serif">
           {label}
         </text>
       )}
@@ -90,7 +90,7 @@ export function PianoFigure({ ring }) {
         <rect key={x} x={x} y="222" width="16" height="26" rx="2" fill="#151515" />
       ))}
       <line x1="196" y1="168" x2="96" y2="168" stroke="#FFFFFF" strokeOpacity="0.45" strokeDasharray="3 5" />
-      <text x="60" y="162" fill="#FFFFFF" fillOpacity="0.6" fontSize="11" fontFamily="Inter, sans-serif">
+      <text x="60" y="162" fill="#FFFFFF" fillOpacity="0.6" fontSize="11" fontFamily="'Inter Variable', Inter, sans-serif">
         knuckle line
       </text>
       <Bones joints={HAND} bones={HAND_BONES} />
@@ -114,7 +114,7 @@ export function DeskFigure({ ring }) {
   return (
     <>
       <circle cx="200" cy="110" r="30" fill="none" stroke="#FFFFFF" strokeOpacity="0.4" strokeDasharray="4 5" />
-      <text x="238" y="92" fill="#FFFFFF" fillOpacity="0.6" fontSize="11" fontFamily="Inter, sans-serif">
+      <text x="238" y="92" fill="#FFFFFF" fillOpacity="0.6" fontSize="11" fontFamily="'Inter Variable', Inter, sans-serif">
         your baseline
       </text>
       <circle cx="200" cy="145" r="30" fill="none" stroke={G} strokeOpacity="0.6" strokeWidth="2" />

@@ -8,8 +8,8 @@ import { DeskFigure, PianoFigure, StanceFigure } from './figures.jsx';
 const SCENES = [
   {
     id: 'sport',
-    tab: 'Sport',
-    title: 'Front stance',
+    tab: 'sport',
+    title: 'front stance',
     Figure: StanceFigure,
     ring: 'kneeR',
     cue: 'Bend your front knee more. Knee over your toes.',
@@ -22,8 +22,8 @@ const SCENES = [
   },
   {
     id: 'music',
-    tab: 'Music',
-    title: 'Piano hand position',
+    tab: 'music',
+    title: 'piano hand position',
     Figure: PianoFigure,
     ring: 'wrist',
     cue: 'Lift your wrist so it lines up with your knuckles.',
@@ -34,8 +34,8 @@ const SCENES = [
   },
   {
     id: 'posture',
-    tab: 'Posture',
-    title: 'Sitting at a desk',
+    tab: 'posture',
+    title: 'sitting at a desk',
     Figure: DeskFigure,
     ring: 'nose',
     cue: 'Sit back up. Your head is sliding forward.',
@@ -112,14 +112,14 @@ export default function HeroScenes() {
           <AnimatePresence mode="wait" initial={false}>
             <motion.div key={scene.id} transition={{ duration: 0.3 }} {...fade} className="flex flex-1 flex-col">
               <div className="border-b border-hairline p-5">
-                <p className="text-[13px] text-muted">You hear</p>
+                <p className="text-[13px] text-muted">you hear</p>
                 <p className="mt-2 flex gap-2.5 text-lg font-medium leading-snug">
                   <Volume2 className="mt-1 h-4 w-4 shrink-0" aria-hidden="true" />
                   {scene.cue}
                 </p>
               </div>
               <div className="p-5">
-                <p className="text-[13px] text-muted">Measured</p>
+                <p className="text-[13px] text-muted">measured</p>
                 <ul className="mt-2 divide-y divide-hairline">
                   {scene.rows.map(([label, value, target, ok]) => (
                     <li key={label} className="flex items-start gap-3 py-2.5 text-[14px]">

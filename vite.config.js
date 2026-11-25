@@ -7,7 +7,7 @@ import react from '@vitejs/plugin-react';
 // browser. On Vercel the same files deploy as serverless functions.
 function devApi() {
   return {
-    name: 'acuity-dev-api',
+    name: 'wobbl-dev-api',
     configureServer(server) {
       server.middlewares.use('/api/coach', async (req, res) => {
         // Vercel parses JSON bodies and adds res.status / res.json; mirror that.

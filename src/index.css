@@ -10,7 +10,7 @@ html {
 body {
   background-color: #f5f5f5;
   color: #000000;
-  font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  font-family: 'Inter Variable', 'Inter', ui-sans-serif, system-ui, sans-serif;
   font-feature-settings: 'ss01', 'cv11';
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
@@ -90,4 +90,46 @@ body {
 .feed-scroll::-webkit-scrollbar-thumb {
   background: #dcdcdc;
   border-radius: 3px;
+}
+
+/* The mascot wobbles once when it appears and again on hover. */
+@keyframes wobbl {
+  0%, 100% { transform: rotate(0deg); }
+  18% { transform: rotate(-8deg); }
+  36% { transform: rotate(6deg); }
+  54% { transform: rotate(-4deg); }
+  72% { transform: rotate(2deg); }
+}
+@keyframes wobbl-again {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-7deg); }
+  50% { transform: rotate(5deg); }
+  75% { transform: rotate(-2deg); }
+}
+@keyframes wobbl-wave {
+  0%, 100% { transform: rotate(0deg); }
+  25%, 75% { transform: rotate(-16deg); }
+  50% { transform: rotate(8deg); }
+}
+.wobbl-mascot {
+  transform-origin: 50% 92%;
+  animation: wobbl 1.4s ease-in-out 0.2s 1;
+  overflow: visible;
+}
+.wobbl-mascot:hover,
+a:hover > .wobbl-mascot {
+  animation: wobbl-again 0.9s ease-in-out 1;
+}
+.wobbl-wave {
+  transform-box: view-box;
+  transform-origin: 56px 66px;
+  animation: wobbl-wave 1.2s ease-in-out 0.6s 2;
+}
+@media (prefers-reduced-motion: reduce) {
+  .wobbl-mascot,
+  .wobbl-mascot:hover,
+  a:hover > .wobbl-mascot,
+  .wobbl-wave {
+    animation: none;
+  }
 }

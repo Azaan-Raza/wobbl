@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { Square } from 'lucide-react';
 import WindowBar from '../components/WindowBar.jsx';
+import Wobbl from '../components/Wobbl.jsx';
 
 const clock = (ms) => {
   const s = Math.floor((ms ?? 0) / 1000);
@@ -42,7 +43,7 @@ export default function LivePanel({
   return (
     <div className="grid grid-cols-[minmax(0,1fr)] gap-6 xl:grid-cols-[minmax(0,1.6fr)_minmax(300px,1fr)]">
       <div className="window min-w-0 self-start">
-        <WindowBar title={`Live: ${drill.name}`}>
+        <WindowBar title={`live: ${drill.name}`}>
           <span className="font-mono text-xs text-muted">{clock(snap?.elapsedMs)}</span>
         </WindowBar>
         <div className="relative aspect-video bg-stage">
@@ -87,7 +88,7 @@ export default function LivePanel({
             {ai ? 'Pause for a second between reps so it can tell them apart.' : 'Red joints are what the last cue was about.'}
           </p>
           <button type="button" onClick={onStop} className="pill-dark py-2 text-sm">
-            <Square className="h-3.5 w-3.5" fill="currentColor" /> Stop and see report
+            <Square className="h-3.5 w-3.5" fill="currentColor" /> stop and see report
           </button>
         </div>
       </div>
@@ -140,12 +141,16 @@ export default function LivePanel({
 
         <section className="window flex min-h-[240px] flex-1 flex-col">
           <div className="border-b border-hairline px-5 py-3">
-            <h2 className="text-[13px] font-medium">What it said</h2>
+            <h2 className="text-[13px] font-medium">what wobbl said</h2>
           </div>
           <ul className="feed-scroll max-h-[360px] flex-1 space-y-2.5 overflow-y-auto p-4" aria-live="polite">
             {feed.length === 0 && (
-              <li className="px-2 py-6 text-center text-[14px] text-muted">
-                Quiet means nothing needs fixing yet. It only speaks when a mistake keeps showing up.
+              <li className="flex flex-col items-center px-2 py-6 text-center text-[14px] text-muted">
+                <Wobbl size={44} />
+                <span className="mt-3 max-w-[16rem]">
+                  Quiet means nothing needs fixing yet. wobbl only speaks up when a mistake keeps
+                  showing up.
+                </span>
               </li>
             )}
             <AnimatePresence initial={false}>

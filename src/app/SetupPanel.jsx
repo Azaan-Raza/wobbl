@@ -11,7 +11,7 @@ export default function SetupPanel({ drill, settings, onSettings, onStart, error
         <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">{drill.name}</h1>
         <p className="mt-2 text-lg text-muted">{drill.blurb}</p>
 
-        <h2 className="mt-8 text-[15px] font-semibold">Before you start</h2>
+        <h2 className="mt-8 text-[15px] font-semibold">before you start</h2>
         <ol className="mt-3 space-y-3">
           {drill.setup.map((step, i) => (
             <li key={step} className="flex gap-3 text-[16px] leading-relaxed">
@@ -45,7 +45,7 @@ export default function SetupPanel({ drill, settings, onSettings, onStart, error
 
         {drill.checks.length > 0 && (
           <>
-            <h2 className="mt-8 text-[15px] font-semibold">What it checks</h2>
+            <h2 className="mt-8 text-[15px] font-semibold">what wobbl checks</h2>
             <ul className="mt-3 divide-y divide-hairline border-y border-hairline text-[15px]">
               {drill.checks.map((c) => (
                 <li key={c.id} className="flex flex-wrap justify-between gap-x-4 gap-y-1 py-2.5">
@@ -59,7 +59,7 @@ export default function SetupPanel({ drill, settings, onSettings, onStart, error
 
         <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
           <button type="button" onClick={onStart} className="pill-dark">
-            Turn on camera and start
+            turn on camera and start
           </button>
           <p className="text-[13px] leading-snug text-muted sm:max-w-xs">
             {drill.mode === 'ai'
@@ -75,7 +75,7 @@ export default function SetupPanel({ drill, settings, onSettings, onStart, error
 
         {scores.length > 1 && (
           <div className="mt-10 border-t border-hairline pt-6">
-            <h2 className="text-[15px] font-semibold">Your last {scores.length} sessions</h2>
+            <h2 className="text-[15px] font-semibold">your last {scores.length} sessions</h2>
             <Trend scores={scores} />
           </div>
         )}

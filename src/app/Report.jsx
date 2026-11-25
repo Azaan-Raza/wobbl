@@ -15,7 +15,7 @@ export default function Report({ drill, summary, history, onAgain, onBack }) {
 
   return (
     <div className="window mx-auto max-w-3xl">
-      <WindowBar title="Session report" />
+      <WindowBar title="session report" />
       <div className="p-6 sm:p-10">
         <p className="text-[15px] text-muted">{drill.name}</p>
         <h1 className="mt-1 text-3xl font-semibold tracking-tight sm:text-4xl">
@@ -70,7 +70,7 @@ export default function Report({ drill, summary, history, onAgain, onBack }) {
 
         {scores.length > 1 && (
           <div className="mt-10">
-            <h2 className="text-[15px] font-semibold">Your last {scores.length} sessions</h2>
+            <h2 className="text-[15px] font-semibold">your last {scores.length} sessions</h2>
             <Trend scores={scores} />
           </div>
         )}
@@ -79,10 +79,10 @@ export default function Report({ drill, summary, history, onAgain, onBack }) {
 
         <div className="mt-6 flex flex-col gap-3 sm:flex-row">
           <button type="button" onClick={onAgain} className="pill-dark">
-            Go again
+            go again
           </button>
           <button type="button" onClick={onBack} className="pill-outline">
-            Change settings
+            change settings
           </button>
         </div>
       </div>

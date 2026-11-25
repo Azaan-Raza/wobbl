@@ -7,6 +7,7 @@ import DrillPicker from './DrillPicker.jsx';
 import SetupPanel from './SetupPanel.jsx';
 import LivePanel from './LivePanel.jsx';
 import Report from './Report.jsx';
+import Wobbl from '../components/Wobbl.jsx';
 
 const defaultsFor = (drill) =>
   Object.fromEntries((drill.options || []).map((o) => [o.id, o.default]));
@@ -145,8 +146,9 @@ export default function TryApp() {
     <div className="flex min-h-screen flex-col bg-paper text-ink">
       <header className="border-b border-hairline bg-paper">
         <div className="flex items-center justify-between gap-4 px-5 py-3 sm:px-8">
-          <a href="../" className="text-[17px] font-semibold tracking-tight">
-            acuity kinetic
+          <a href="../" className="flex items-center gap-1.5 text-[20px] font-bold tracking-[-0.05em]">
+            <Wobbl size={26} head />
+            wobbl
           </a>
           <div className="flex items-center gap-2">
             <button
@@ -156,10 +158,10 @@ export default function TryApp() {
               className="inline-flex items-center gap-1.5 rounded-full border border-hairline px-3 py-1.5 text-sm text-muted transition-colors hover:border-line hover:text-ink"
             >
               {muted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
-              {muted ? 'Voice off' : 'Voice on'}
+              {muted ? 'voice off' : 'voice on'}
             </button>
             <a href="../" className="hidden rounded-full px-3 py-1.5 text-sm text-muted hover:text-ink sm:inline">
-              Back to the site
+              back to the site
             </a>
           </div>
         </div>

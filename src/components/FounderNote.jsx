@@ -37,10 +37,10 @@ export default function FounderNote({ showToast }) {
   return (
     <section id="waitlist" className="px-5 py-20 sm:px-8 sm:py-28">
       <div className="window mx-auto max-w-2xl">
-        <WindowBar title="A note from the founder" />
+        <WindowBar title="a note from the founder" />
 
         <div className="px-6 py-10 sm:px-12 sm:py-14">
-          <h2 className="text-4xl font-semibold tracking-tight sm:text-5xl">Hey, I'm Azaan.</h2>
+          <h2 className="text-4xl font-semibold tracking-tight sm:text-5xl">hey, i'm azaan.</h2>
 
           <div className="mt-7 space-y-5 text-lg leading-relaxed text-[#2B2B2B]">
             <p>
@@ -49,7 +49,7 @@ export default function FounderNote({ showToast }) {
               out of the gym and think "why am I not getting better?" and have no real answer.
             </p>
             <p>
-              That's why I built Acuity Kinetic. I wanted something that actually watches you and
+              That's why I built wobbl. I wanted something that actually watches you and
               tells you what's wrong, right when it matters.
             </p>
             <p>
@@ -59,7 +59,7 @@ export default function FounderNote({ showToast }) {
           </div>
 
           <p className="mt-8 font-semibold">Azaan</p>
-          <p className="text-[15px] text-muted">Founder, Acuity Kinetic</p>
+          <p className="text-[15px] text-muted">founder, wobbl</p>
 
           <div className="mt-10 border-t border-hairline pt-8">
             {joined ? (
@@ -89,7 +89,7 @@ export default function FounderNote({ showToast }) {
                     className="field flex-1"
                   />
                   <button type="submit" disabled={submitting} className="pill-dark">
-                    {submitting ? 'Adding you…' : 'Join the waitlist'}
+                    {submitting ? 'adding you…' : 'join the waitlist'}
                   </button>
                 </form>
               </>
