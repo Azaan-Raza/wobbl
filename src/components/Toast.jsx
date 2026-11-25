@@ -15,14 +15,12 @@ export default function Toast({ toast }) {
         {toast && (
           <motion.div
             key={toast.id}
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 20 }}
-            transition={{ duration: 0.25, ease: 'easeOut' }}
-            className={`pointer-events-auto rounded-btn border px-4 py-3 text-sm font-medium ${
-              toast.type === 'error'
-                ? 'border-red-500/50 bg-card text-red-400'
-                : 'border-accent/50 bg-card text-accent'
+            exit={{ opacity: 0, y: 16 }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            className={`pointer-events-auto rounded-full px-5 py-3 text-sm font-medium shadow-float ${
+              toast.type === 'error' ? 'bg-white text-[#B3261E] ring-1 ring-[#B3261E]/30' : 'bg-graphite text-white'
             }`}
           >
             {toast.message}

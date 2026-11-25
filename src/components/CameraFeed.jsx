@@ -16,7 +16,7 @@ const DISTANCE_UI = {
   good: { label: 'Good distance', dot: 'bg-accent', text: 'text-accent' },
   close: { label: 'Move back', dot: 'bg-amber-400', text: 'text-amber-400' },
   far: { label: 'Move closer', dot: 'bg-amber-400', text: 'text-amber-400' },
-  none: { label: 'Step into frame', dot: 'bg-muted', text: 'text-muted' },
+  none: { label: 'Step into frame', dot: 'bg-white/60', text: 'text-white/80' },
 };
 
 // Owns the webcam lifecycle. The <video> ref is supplied by the parent (Demo)
@@ -169,17 +169,13 @@ export default function CameraFeed({ videoRef, isCoaching, onReadyChange, onDist
     };
   }, [status, videoRef]);
 
-  const glow = isCoaching && status === 'ready';
+  const live = isCoaching && status === 'ready';
   const d = DISTANCE_UI[distance] ?? DISTANCE_UI.none;
 
   return (
     <div
-      className="relative overflow-hidden rounded-card border border-line bg-black"
-      style={
-        glow
-          ? { boxShadow: '0 0 0 1px #00FF85, 0 0 28px rgba(0, 255, 133, 0.35)' }
-          : undefined
-      }
+      className="relative overflow-hidden bg-stage"
+      style={live ? { boxShadow: 'inset 0 0 0 2px #00E07A' } : undefined}
     >
       {/* Mirrored for a natural selfie view; capture reads the true frame from the stream */}
       <video
@@ -187,7 +183,7 @@ export default function CameraFeed({ videoRef, isCoaching, onReadyChange, onDist
         playsInline
         muted
         aria-label={isCoaching ? 'Live camera feed, coaching active' : 'Live camera feed'}
-        className="aspect-video w-full bg-black object-cover"
+        className="aspect-video w-full bg-stage object-cover"
         style={{ transform: 'scaleX(-1)' }}
       />
 
@@ -201,49 +197,49 @@ export default function CameraFeed({ videoRef, isCoaching, onReadyChange, onDist
 
       {/* REC indicator */}
       {isCoaching && status === 'ready' && (
-        <div className="absolute left-3 top-3 flex items-center gap-2 rounded-btn bg-black/60 px-2.5 py-1">
-          <span className="relative flex h-2.5 w-2.5">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-500 opacity-75" />
-            <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-red-500" />
+        <div className="absolute left-3 top-3 flex items-center gap-2 rounded-full bg-black/60 px-2.5 py-1">
+          <span className="relative flex h-2 w-2">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#FF453A] opacity-75 motion-reduce:animate-none" />
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-[#FF453A]" />
           </span>
-          <span className="text-xs font-semibold tracking-wide text-white">REC</span>
+          <span className="text-[11px] font-semibold tracking-wide text-white">LIVE</span>
         </div>
       )}
 
       {/* Distance / framing indicator */}
       {status === 'ready' && (
         <div
-          className="absolute bottom-3 left-1/2 flex -translate-x-1/2 items-center gap-2 rounded-btn bg-black/60 px-3 py-1.5"
+          className="absolute bottom-3 left-1/2 flex -translate-x-1/2 items-center gap-2 rounded-full bg-black/60 px-3 py-1"
           role="status"
           aria-live="polite"
         >
           <span className={`h-2 w-2 rounded-full ${d.dot}`} />
-          <span className={`text-xs font-semibold tracking-wide ${d.text}`}>{d.label}</span>
+          <span className={`text-[11px] font-semibold tracking-wide ${d.text}`}>{d.label}</span>
         </div>
       )}
 
       {/* Permission / error overlays */}
       {status !== 'ready' && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-ink/95 p-6 text-center">
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-stage p-6 text-center">
           {status === 'loading' && (
             <>
-              <Camera className="h-7 w-7 text-muted" />
-              <p className="text-sm text-muted">Requesting camera access…</p>
+              <Camera className="h-7 w-7 text-white/60" />
+              <p className="text-sm text-white/70">Waiting for camera access…</p>
             </>
           )}
           {status === 'denied' && (
             <>
-              <CameraOff className="h-7 w-7 text-red-500" />
+              <CameraOff className="h-7 w-7 text-[#FF453A]" />
               <p className="max-w-xs text-sm text-white">
-                Camera access required. Enable it in your browser settings.
+                Camera access is blocked. Allow it in your browser's site settings, then turn the camera on again.
               </p>
             </>
           )}
           {status === 'error' && (
             <>
-              <CameraOff className="h-7 w-7 text-red-500" />
+              <CameraOff className="h-7 w-7 text-[#FF453A]" />
               <p className="max-w-xs text-sm text-white">
-                No camera available. Connect a camera and reload the page.
+                No camera found. Connect one, then turn the camera on again.
               </p>
             </>
           )}

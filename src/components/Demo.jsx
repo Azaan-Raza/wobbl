@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ArrowRight, Play, Square } from 'lucide-react';
+import { Camera, Play, Square, Trash2, Volume2, VolumeX } from 'lucide-react';
+import WindowBar from './WindowBar.jsx';
 import CameraFeed from './CameraFeed.jsx';
 import FeedbackPanel from './FeedbackPanel.jsx';
 import { captureFrame } from '../utils/captureFrame.js';
@@ -7,13 +8,14 @@ import { speak, stopSpeaking } from '../utils/speechOutput.js';
 import { playCueChime, primeAudio } from '../utils/soundFx.js';
 import { getCoachingFeedback } from '../utils/coachApi.js';
 
-const STEPS = ['Allow camera access', 'Pick your sport', 'Hit Start Coaching'];
-
 const CAPTURE_INTERVAL_MS = 2500;
 const RETRY_DELAY_MS = 5000;
 
 export default function Demo({ sports, selectedSport, onSportChange, showToast }) {
   const videoRef = useRef(null);
+  // The camera stays off until the visitor asks for it, so the browser's
+  // permission prompt never fires on page load.
+  const [cameraOn, setCameraOn] = useState(false);
   const [cameraReady, setCameraReady] = useState(false);
   const [isCoaching, setIsCoaching] = useState(false);
   const [muted, setMuted] = useState(false);
@@ -35,7 +37,7 @@ export default function Demo({ sports, selectedSport, onSportChange, showToast }
 
   const onReadyChange = useCallback((ready) => setCameraReady(ready), []);
 
-  // Latest camera-distance status from the pose overlay ('good' | 'close' | 'far' | 'none').
+  // Latest framing status from the pose overlay ('good' | 'close' | 'far' | 'none').
   const distanceRef = useRef('none');
   const onDistanceChange = useCallback((s) => {
     distanceRef.current = s;
@@ -58,10 +60,10 @@ export default function Demo({ sports, selectedSport, onSportChange, showToast }
     );
   }, []);
 
-  // The coaching loop: capture a frame, analyze it, dedupe, render + speak.
+  // The coaching loop: capture a frame, analyze it, dedupe, render and speak.
   // Self-scheduling so success and failure can use different cadences.
   useEffect(() => {
-    if (!isCoaching || !cameraReady) return;
+    if (!isCoaching || !cameraReady) return undefined;
 
     let cancelled = false;
     let timer;
@@ -69,8 +71,8 @@ export default function Demo({ sports, selectedSport, onSportChange, showToast }
     const tick = async () => {
       if (cancelled) return;
 
-      // No athlete confidently in frame, so skip the API call (saves quota) and
-      // let the on-screen "Step into frame" indicator guide positioning.
+      // Nobody confidently in frame: skip the call and let the on-screen
+      // framing pill guide positioning.
       if (distanceRef.current === 'none') {
         timer = setTimeout(tick, CAPTURE_INTERVAL_MS);
         return;
@@ -96,7 +98,7 @@ export default function Demo({ sports, selectedSport, onSportChange, showToast }
         timer = setTimeout(tick, CAPTURE_INTERVAL_MS);
       } catch {
         if (cancelled) return;
-        showToast('Could not reach the coach, retrying.', 'error');
+        showToast("Couldn't reach the coach. Retrying in a few seconds.", 'error');
         timer = setTimeout(tick, RETRY_DELAY_MS);
       }
     };
@@ -107,7 +109,7 @@ export default function Demo({ sports, selectedSport, onSportChange, showToast }
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [isCoaching, cameraReady, addFeedback, showToast]); 
+  }, [isCoaching, cameraReady, addFeedback, showToast]);
 
   const toggleCoaching = () => {
     if (isCoaching) {
@@ -116,12 +118,18 @@ export default function Demo({ sports, selectedSport, onSportChange, showToast }
       return;
     }
     if (!cameraReady) {
-      showToast('Camera not ready yet.', 'error');
+      showToast('Turn on your camera first.', 'error');
       return;
     }
     lastFeedbackRef.current = '';
     primeAudio();
     setIsCoaching(true);
+  };
+
+  const turnCameraOff = () => {
+    setIsCoaching(false);
+    stopSpeaking();
+    setCameraOn(false);
   };
 
   const toggleMute = () => {
@@ -138,96 +146,111 @@ export default function Demo({ sports, selectedSport, onSportChange, showToast }
   };
 
   return (
-    <section id="demo" className="border-t border-line bg-ink">
-      <div className="mx-auto max-w-7xl px-5 py-20 sm:px-8 sm:py-28">
-        <div className="mb-10 max-w-3xl">
-          <p className="mb-4 text-xs font-medium uppercase tracking-[0.22em] text-muted">
-            Live demo
+    <section id="demo" className="px-5 py-20 sm:px-8 sm:py-28">
+      <div className="mx-auto max-w-page">
+        <div className="max-w-2xl">
+          <h2 className="text-section font-semibold">try it now.</h2>
+          <p className="mt-5 text-lead text-muted">
+            Turn on your camera, pick a sport and press start. Stand back so your whole body is in
+            frame. Cues show up within a few seconds.
           </p>
-          <h2 className="font-display text-4xl font-bold leading-[0.95] tracking-tight text-bone sm:text-5xl">
-            Try it yourself.
-          </h2>
-          <p className="mt-4 text-muted sm:text-lg">
-            Three steps and you are training. Cues show up within a few seconds.
-          </p>
-          <ol className="mt-6 flex flex-wrap items-center gap-2 text-sm">
-            {STEPS.map((step, i) => (
-              <li key={step} className="flex items-center gap-2">
-                <span className="flex items-center gap-2 rounded-btn border border-line bg-card px-3 py-1.5">
-                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-accent text-xs font-bold text-ink">
-                    {i + 1}
-                  </span>
-                  <span className="font-medium text-white">{step}</span>
-                </span>
-                {i < STEPS.length - 1 && (
-                  <ArrowRight className="hidden h-4 w-4 text-muted sm:block" aria-hidden="true" />
-                )}
-              </li>
-            ))}
-          </ol>
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-2">
-          {/* Left: camera */}
-          <div className="flex flex-col gap-4">
-            <div className="flex items-center gap-3">
-              <label
-                htmlFor="sport"
-                className="text-xs font-medium uppercase tracking-[0.2em] text-muted"
+        <div className="window mt-12">
+          <WindowBar title="acuity kinetic">
+            {cameraOn && (
+              <button
+                type="button"
+                onClick={turnCameraOff}
+                className="rounded-full px-2.5 py-0.5 text-xs text-muted transition-colors hover:bg-white hover:text-ink"
               >
-                Sport
-              </label>
-              <select
-                id="sport"
-                value={selectedSport}
-                onChange={(e) => onSportChange(e.target.value)}
-                disabled={isCoaching}
-                className="flex-1 rounded-btn border border-line bg-card px-3 py-2 text-sm text-white outline-none transition-colors focus:border-accent disabled:opacity-50"
-              >
-                {sports.map((s) => (
-                  <option key={s} value={s}>
-                    {s}
-                  </option>
-                ))}
-              </select>
-            </div>
+                turn camera off
+              </button>
+            )}
+          </WindowBar>
 
-            <CameraFeed
-              videoRef={videoRef}
-              isCoaching={isCoaching}
-              onReadyChange={onReadyChange}
-              onDistanceChange={onDistanceChange}
-            />
+          {/* Controls */}
+          <div className="flex flex-wrap items-center gap-3 border-b border-hairline px-4 py-3">
+            <label htmlFor="sport" className="sr-only">
+              Sport
+            </label>
+            <select
+              id="sport"
+              value={selectedSport}
+              onChange={(e) => onSportChange(e.target.value)}
+              disabled={isCoaching}
+              className="field w-auto min-w-[11rem] cursor-pointer py-2 pr-9 text-sm"
+            >
+              {sports.map((s) => (
+                <option key={s} value={s}>
+                  {s}
+                </option>
+              ))}
+            </select>
 
             <button
+              type="button"
+              onClick={toggleMute}
+              aria-pressed={muted}
+              className="inline-flex items-center gap-1.5 rounded-full border border-hairline px-3 py-2 text-sm text-muted transition-colors hover:border-line hover:text-ink"
+            >
+              {muted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+              {muted ? 'muted' : 'sound on'}
+            </button>
+            <button
+              type="button"
+              onClick={clearFeed}
+              disabled={feedback.length === 0}
+              className="inline-flex items-center gap-1.5 rounded-full border border-hairline px-3 py-2 text-sm text-muted transition-colors hover:border-line hover:text-ink disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              <Trash2 className="h-4 w-4" />
+              clear
+            </button>
+
+            <button
+              type="button"
               onClick={toggleCoaching}
               disabled={!cameraReady}
-              className={`flex items-center justify-center gap-2 rounded-btn px-5 py-3 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
-                isCoaching
-                  ? 'border border-red-500/60 bg-transparent text-red-400 hover:bg-red-500/10'
-                  : 'bg-accent text-ink hover:opacity-90'
-              }`}
+              className={`ml-auto py-2 text-sm ${isCoaching ? 'pill-outline' : 'pill-dark'}`}
             >
               {isCoaching ? (
                 <>
-                  <Square className="h-4 w-4" fill="currentColor" /> Stop Coaching
+                  <Square className="h-3.5 w-3.5" fill="currentColor" /> stop coaching
                 </>
               ) : (
                 <>
-                  <Play className="h-4 w-4" fill="currentColor" /> Start Coaching
+                  <Play className="h-3.5 w-3.5" fill="currentColor" /> start coaching
                 </>
               )}
             </button>
           </div>
 
-          {/* Right: feedback */}
-          <FeedbackPanel
-            feedback={feedback}
-            muted={muted}
-            onToggleMute={toggleMute}
-            onClear={clearFeed}
-            isCoaching={isCoaching}
-          />
+          <div className="grid lg:grid-cols-[1.4fr_1fr]">
+            {cameraOn ? (
+              <CameraFeed
+                videoRef={videoRef}
+                isCoaching={isCoaching}
+                onReadyChange={onReadyChange}
+                onDistanceChange={onDistanceChange}
+              />
+            ) : (
+              <div className="flex aspect-video flex-col items-center justify-center gap-4 bg-stage p-6 text-center">
+                <Camera className="h-7 w-7 text-white/60" strokeWidth={1.75} aria-hidden="true" />
+                <p className="max-w-xs text-sm text-white/70">
+                  Your camera stays off until you turn it on.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setCameraOn(true)}
+                  className="pill border-white bg-white text-ink"
+                >
+                  turn on camera
+                </button>
+              </div>
+            )}
+
+            <FeedbackPanel feedback={feedback} isCoaching={isCoaching} cameraReady={cameraReady} />
+          </div>
         </div>
       </div>
     </section>

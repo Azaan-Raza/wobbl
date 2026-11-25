@@ -2,59 +2,41 @@
 
 # Acuity Kinetic
 
-### A coach in your pocket. Real feedback, in real time.
+### A coach that watches you train.
 
 ![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-5-646CFF?logo=vite&logoColor=white)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3-38BDF8?logo=tailwindcss&logoColor=white)
-![three.js](https://img.shields.io/badge/three.js-r184-000000?logo=threedotjs&logoColor=white)
 
-Point your camera, pick a sport, and get a short spoken cue on your form, in real time.
+Point your camera at yourself, pick your sport, and hear one short correction at a time, while you're still moving.
 
 </div>
-
-> Acuity Kinetic watches how you move and tells you what to fix while you are still moving, the way a coach calls out a correction from the sideline.
 
 ---
 
 ## Contents
 
-1. [What it is](#what-it-is)
-2. [What it does](#what-it-does)
-3. [How a cue is made](#how-a-cue-is-made)
-4. [Tech stack](#tech-stack)
-5. [Running it locally](#running-it-locally)
-6. [Environment variables](#environment-variables)
-7. [Project structure](#project-structure)
-8. [Deploying](#deploying)
-
-<details>
-<summary>About this project</summary>
-
-This is a polished demo, built to feel like a real product rather than a prototype. The whole thing runs in the browser: the camera feed never leaves your device until a single frame is sent off for analysis, and the pose tracking that frames you up happens locally. It is meant to be quick to read and quick to try.
-
-</details>
-
----
-
-## What it is
-
-Acuity Kinetic is a web demo of a real-time AI sports coaching tool. It watches you through your camera, reads your body position, and speaks one short coaching cue at a time. The idea is simple: get the kind of feedback a coach would give you mid-set, without anyone standing there.
-
-[Back to top](#contents)
+1. [What it does](#what-it-does)
+2. [How a cue is made](#how-a-cue-is-made)
+3. [Tech stack](#tech-stack)
+4. [Running it locally](#running-it-locally)
+5. [Environment variables](#environment-variables)
+6. [Project structure](#project-structure)
+7. [Deploying](#deploying)
 
 ---
 
 ## What it does
 
-- A short loading intro ("For athletes, by an athlete") with a progress bar that fades into the site.
-- A hero with a 3D scene that cross-fades through a dribbling basketball, a tennis racket and ball, and a golf putter and ball.
+- A light, single-page site: hero, how it works, live demo, founder note with the waitlist, FAQ.
+- A scripted preview of a live session in the hero: pose overlay, a ring on the joint being corrected, and the cue the athlete hears.
 - A live demo that uses your webcam:
+  - The camera stays off until you press "turn on camera", so the permission prompt never fires on page load.
   - On-device pose detection draws a skeleton overlay and tells you whether you are too close, too far, or well framed.
-  - Every 2.5 seconds it sends a frame to a vision model and shows the cue it gets back.
-  - Cues appear newest first, repeats are filtered out, and each one is read aloud (with a mute toggle and a small chime when it arrives).
-  - When no one is in frame, it skips the call to save quota.
-- A waitlist that records real signups to a Google Sheet.
+  - Every 2.5 seconds it sends one frame to `/api/coach` and shows the cue it gets back.
+  - Cues appear newest first, repeats are filtered out, and each one is read aloud (with a mute toggle and a small chime).
+  - When nobody is in frame, it skips the call to save quota.
+- A waitlist that records signups to a Google Sheet.
 
 [Back to top](#contents)
 
@@ -62,13 +44,11 @@ Acuity Kinetic is a web demo of a real-time AI sports coaching tool. It watches 
 
 ## How a cue is made
 
-The same loop runs a few times a minute while you train. Each pass takes one frame from your camera to a spoken cue.
-
 1. Capture a frame from the live camera and scale it down to a small JPEG.
-2. Check framing with a local pose model. If no athlete is found, the frame is dropped before anything is sent.
-3. Send the frame to a vision model with instructions written for the sport you picked, asking for the single most important correction.
+2. Check framing with a local pose model (MediaPipe, 33 body landmarks). If no athlete is found, the frame is dropped before anything is sent.
+3. Post the frame and the sport to `/api/coach`. That server function adds the sport-specific instructions and calls Gemini with a key that only the server knows.
 4. Get back one short cue, fifteen words or fewer. Identical back-to-back cues are discarded.
-5. Show the cue at the top of the feed with a timestamp and read it aloud, unless you have muted it.
+5. Show the cue at the top of the feed with a timestamp and read it aloud, unless muted.
 
 If a request fails or times out, a brief notice appears and the loop retries on its own.
 
@@ -79,11 +59,10 @@ If a request fails or times out, a brief notice appears and the loop retries on 
 ## Tech stack
 
 - React 18 and Vite
-- Tailwind CSS for styling
-- Framer Motion for animation
-- three.js with react-three-fiber and drei for the 3D scene
+- Tailwind CSS (tokens in `tailwind.config.js`), Inter and Geist Mono
+- Framer Motion for the few animations that matter
 - MediaPipe Tasks Vision for in-browser pose detection
-- A vision model for the coaching cues
+- Gemini (default `gemini-2.5-flash-lite`) behind a Vercel serverless function
 - Web Speech API for the voice, Web Audio for the chime
 
 [Back to top](#contents)
@@ -95,18 +74,12 @@ If a request fails or times out, a brief notice appears and the loop retries on 
 You need Node 18 or newer.
 
 ```bash
-# 1. install dependencies
 npm install
-
-# 2. add your keys
-cp .env.example .env
-#    then open .env and fill it in (see the next section)
-
-# 3. start the dev server
+cp .env.example .env   # then paste your Gemini key into GEMINI_API_KEY
 npm run dev
 ```
 
-Open the printed URL (usually `http://localhost:5173`) in Chrome, allow camera access, choose a sport, and start coaching. The camera and speech features need a secure context, and `localhost` counts as secure, so local development works out of the box.
+Open the printed URL (usually `http://localhost:5173`) in Chrome. The dev server runs `/api/coach` for you, so local behaves the same as production and the key never reaches the browser.
 
 [Back to top](#contents)
 
@@ -114,13 +87,13 @@ Open the printed URL (usually `http://localhost:5173`) in Chrome, allow camera a
 
 ## Environment variables
 
-Everything lives in `.env`. Copy `.env.example` to get started.
+| Variable | Where | Required | What it is |
+| --- | --- | --- | --- |
+| `GEMINI_API_KEY` | server | yes | Gemini key used by `/api/coach`. Get one free at https://aistudio.google.com/app/apikey |
+| `COACH_MODEL` | server | no | Override the model id. Defaults to `gemini-2.5-flash-lite`. |
+| `VITE_WAITLIST_URL` | browser | no | Google Apps Script web app URL for the waitlist, ending in `/exec`. Without it the form works in the UI but records nothing. |
 
-| Variable | Required | What it is |
-| --- | --- | --- |
-| `VITE_GEMINI_API_KEY` | yes | The API key for the vision model that writes the cues. See `.env.example` for where to get one free. |
-| `VITE_COACH_MODEL` | no | Override the model id. Defaults to a fast, low-latency model that suits a frame every couple of seconds. |
-| `VITE_WAITLIST_URL` | no | A Google Apps Script web app URL for the waitlist. It must end in `/exec`. Without it, the form still works in the UI but does not record anything. |
+Never give the Gemini key a `VITE_` prefix in client code: anything referenced as `import.meta.env.VITE_*` is baked into the public bundle.
 
 [Back to top](#contents)
 
@@ -128,42 +101,40 @@ Everything lives in `.env`. Copy `.env.example` to get started.
 
 ## Project structure
 
-<details>
-<summary>Show the file tree</summary>
-
 ```
 .
+├── api/
+│   └── coach.js              # POST /api/coach: validates input, calls Gemini server-side
+├── public/favicon.svg
 ├── index.html
-├── tailwind.config.js          # design tokens (colors, fonts, radii)
-├── postcss.config.js
-├── .env.example
+├── tailwind.config.js        # design tokens (colors, type scale, shadows)
+├── vite.config.js            # runs /api in the dev server
 └── src/
-    ├── main.jsx
-    ├── index.css
-    ├── App.jsx                 # layout, shared sport state, toasts
+    ├── App.jsx               # page layout, sport state, toasts
+    ├── index.css             # pill buttons, window chrome, focus styles
     ├── components/
-    │   ├── LoadingScreen.jsx   # the intro overlay
-    │   ├── Hero.jsx            # headline, calls to action, the 3D scene
-    │   ├── SportsScene.jsx     # procedural three.js models and animation
-    │   ├── Capabilities.jsx    # the scroll-revealed feature section
-    │   ├── Demo.jsx            # camera, capture loop, model calls
-    │   ├── CameraFeed.jsx      # webcam, pose overlay, distance, REC dot
-    │   ├── FeedbackPanel.jsx   # the cue feed, mute, clear
-    │   ├── Pipeline.jsx        # the step-by-step section
-    │   ├── Waitlist.jsx
+    │   ├── Nav.jsx
+    │   ├── Hero.jsx
+    │   ├── HeroSession.jsx   # scripted live-session preview
+    │   ├── HowItWorks.jsx
+    │   ├── Demo.jsx          # camera, capture loop, controls
+    │   ├── CameraFeed.jsx    # webcam, pose overlay, framing pill
+    │   ├── FeedbackPanel.jsx # the cue feed
+    │   ├── FounderNote.jsx   # founder letter and waitlist form
+    │   ├── Faq.jsx
     │   ├── Footer.jsx
+    │   ├── WindowBar.jsx     # Mac-style title bar
     │   └── Toast.jsx
     └── utils/
-        ├── captureFrame.js         # video frame to a small base64 JPEG
-        ├── speechOutput.js         # Web Speech wrapper
-        ├── soundFx.js              # the arrival chime
-        ├── poseDetector.js         # MediaPipe pose and distance estimate
-        ├── proceduralTextures.js   # canvas textures for the 3D models
-        ├── coachApi.js             # the vision model call
-        └── waitlist.js             # the Google Sheet signup
+        ├── coachApi.js       # client: POST to /api/coach
+        ├── coachPrompt.js    # prompt and request shape, used by the server
+        ├── captureFrame.js
+        ├── poseDetector.js
+        ├── speechOutput.js
+        ├── soundFx.js
+        ├── sports.js
+        └── waitlist.js
 ```
-
-</details>
 
 [Back to top](#contents)
 
@@ -171,10 +142,13 @@ Everything lives in `.env`. Copy `.env.example` to get started.
 
 ## Deploying
 
-Two things to know before putting this on the public web:
+On Vercel:
 
-- The app calls the model directly from the browser using your key, so the key ends up in the client bundle. That is fine for a local or private demo, but not for a public site. For production, move the call behind a small serverless function that holds the key and point the client at it.
-- The camera and speech features need HTTPS in production. `localhost` is treated as secure during development, but a deployed site has to be served over HTTPS.
+1. Add `GEMINI_API_KEY` under Project Settings, Environment Variables (Production and Preview).
+2. Delete the old `VITE_GEMINI_API_KEY` variable once `GEMINI_API_KEY` is set, and rotate the old key in Google AI Studio, because earlier builds shipped it in the public bundle.
+3. Push. Vercel builds the site and deploys `api/coach.js` as a serverless function.
+
+The camera and speech features need HTTPS, which Vercel provides.
 
 [Back to top](#contents)
 

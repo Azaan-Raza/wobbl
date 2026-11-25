@@ -48,7 +48,7 @@ export async function makeSkeletonDrawer(ctx) {
   const connections = PoseLandmarker.POSE_CONNECTIONS;
   return (landmarks) => {
     utils.drawConnectors(landmarks, connections, {
-      color: 'rgba(0, 255, 133, 0.7)',
+      color: 'rgba(0, 224, 122, 0.7)',
       lineWidth: 3,
     });
     // Densify: interpolate extra points along every bone so the map shows far
@@ -62,10 +62,10 @@ export async function makeSkeletonDrawer(ctx) {
         dense.push({ x: a.x + (b.x - a.x) * f, y: a.y + (b.y - a.y) * f, z: 0 });
       }
     }
-    utils.drawLandmarks(dense, { color: 'rgba(0, 255, 133, 0.85)', radius: 1.6 });
+    utils.drawLandmarks(dense, { color: 'rgba(0, 224, 122, 0.85)', radius: 1.6 });
     utils.drawLandmarks(landmarks, {
-      color: '#00FF85',
-      fillColor: '#0A0A0A',
+      color: '#00E07A',
+      fillColor: '#151515',
       lineWidth: 1,
       radius: 4,
     });

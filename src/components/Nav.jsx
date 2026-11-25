@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react';
 
 const LINKS = [
-  { label: 'Demo', id: 'demo' },
-  { label: 'How it works', id: 'how-it-works' },
-  { label: 'Pipeline', id: 'pipeline' },
+  { label: 'how it works', href: '#how-it-works' },
+  { label: 'demo', href: '#demo' },
+  { label: 'faq', href: '#faq' },
 ];
 
-// Fixed top bar. Stays transparent over the hero and picks up a blurred ink
-// background once the page scrolls, so it never fights the 3D scene behind it.
-export default function Nav({ onNavigate, onJoin }) {
+// Fixed top bar. Transparent over the hero, then a soft blurred paper
+// background once the page scrolls.
+export default function Nav() {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -20,38 +20,30 @@ export default function Nav({ onNavigate, onJoin }) {
 
   return (
     <header
-      className={`fixed inset-x-0 top-0 z-50 transition-colors duration-300 ${
-        scrolled
-          ? 'border-b border-line bg-ink/80 backdrop-blur-md'
-          : 'border-b border-transparent'
+      className={`fixed inset-x-0 top-0 z-50 transition-colors duration-200 ${
+        scrolled ? 'border-b border-hairline bg-paper/85 backdrop-blur-md' : 'border-b border-transparent'
       }`}
     >
-      <nav className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 sm:px-8">
-        <button
-          onClick={() => onNavigate('top')}
-          className="font-display text-lg font-bold tracking-tight text-bone"
-        >
-          Acuity <span className="text-accent">Kinetic</span>
-        </button>
+      <nav className="mx-auto flex max-w-page items-center justify-between px-5 py-3.5 sm:px-8">
+        <a href="#top" className="text-[17px] font-semibold tracking-tight">
+          acuity kinetic
+        </a>
 
-        <div className="hidden items-center gap-9 md:flex">
+        <div className="hidden items-center gap-8 md:flex">
           {LINKS.map((l) => (
-            <button
-              key={l.id}
-              onClick={() => onNavigate(l.id)}
-              className="text-sm text-muted transition-colors hover:text-white"
+            <a
+              key={l.href}
+              href={l.href}
+              className="text-[15px] text-muted transition-colors hover:text-ink"
             >
               {l.label}
-            </button>
+            </a>
           ))}
         </div>
 
-        <button
-          onClick={onJoin}
-          className="rounded-btn bg-accent px-4 py-2 text-sm font-semibold text-ink transition-opacity hover:opacity-90"
-        >
-          Join waitlist
-        </button>
+        <a href="#waitlist" className="pill-outline px-5 py-2 text-sm">
+          join the waitlist
+        </a>
       </nav>
     </header>
   );
