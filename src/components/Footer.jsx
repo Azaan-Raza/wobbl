@@ -1,7 +1,7 @@
 const LINKS = [
   { label: 'Products', href: '#products' },
   { label: 'How it works', href: '#how-it-works' },
-  { label: 'Open the app', href: '/try/' },
+  { label: 'Open the app', href: 'try/' },
   { label: 'Waitlist', href: '#waitlist' },
   { label: 'FAQ', href: '#faq' },
 ];

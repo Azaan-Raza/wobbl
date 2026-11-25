@@ -145,7 +145,7 @@ export default function TryApp() {
     <div className="flex min-h-screen flex-col bg-paper text-ink">
       <header className="border-b border-hairline bg-paper">
         <div className="flex items-center justify-between gap-4 px-5 py-3 sm:px-8">
-          <a href="/" className="text-[17px] font-semibold tracking-tight">
+          <a href="../" className="text-[17px] font-semibold tracking-tight">
             acuity kinetic
           </a>
           <div className="flex items-center gap-2">
@@ -158,7 +158,7 @@ export default function TryApp() {
               {muted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
               {muted ? 'Voice off' : 'Voice on'}
             </button>
-            <a href="/" className="hidden rounded-full px-3 py-1.5 text-sm text-muted hover:text-ink sm:inline">
+            <a href="../" className="hidden rounded-full px-3 py-1.5 text-sm text-muted hover:text-ink sm:inline">
               Back to the site
             </a>
           </div>

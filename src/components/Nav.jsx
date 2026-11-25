@@ -41,7 +41,7 @@ export default function Nav() {
           ))}
         </div>
 
-        <a href="/try/" className="pill-dark px-5 py-2 text-sm">
+        <a href="try/" className="pill-dark px-5 py-2 text-sm">
           Open the app
         </a>
       </nav>

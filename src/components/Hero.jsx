@@ -14,7 +14,7 @@ export default function Hero() {
         </p>
 
         <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
-          <a href="/try/" className="pill-dark w-full sm:w-auto">
+          <a href="try/" className="pill-dark w-full sm:w-auto">
             Open the app
           </a>
           <a href="#waitlist" className="pill-outline w-full sm:w-auto">

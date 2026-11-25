@@ -14,7 +14,7 @@ const PRODUCTS = [
       ['Tae Kwon Do front stance', 'Front knee, back leg, stance length, posture and back heel.'],
       ['Any other sport', 'An AI coach looks at three frames from each rep, plus your joint angles.'],
     ],
-    link: ['/try/#squat', 'Try squats'],
+    link: ['try/#squat', 'Try squats'],
   },
   {
     id: 'music',
@@ -26,7 +26,7 @@ const PRODUCTS = [
       ['Piano', 'Wrist height and how curved your fingers are, from a camera beside the keys.'],
       ['Guitar', 'How far your fretting wrist bends, where your head is, and shoulder tension.'],
     ],
-    link: ['/try/#piano', 'Try piano'],
+    link: ['try/#piano', 'Try piano'],
   },
   {
     id: 'posture',
@@ -40,7 +40,7 @@ const PRODUCTS = [
         'It learns how you sit when you sit well, then speaks up if you slouch, hunch, lean or creep toward the screen for more than 8 seconds.',
       ],
     ],
-    link: ['/try/#desk', 'Try it at your desk'],
+    link: ['try/#desk', 'Try it at your desk'],
   },
 ];
 
