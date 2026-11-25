@@ -1,36 +1,37 @@
 import { Plus } from 'lucide-react';
-import { SPORTS } from '../utils/sports.js';
-
-const sportList = `${SPORTS.slice(0, -1).join(', ').toLowerCase()} and ${SPORTS.at(-1).toLowerCase()}`;
 
 const QUESTIONS = [
   {
-    q: 'what is acuity kinetic?',
-    a: 'A coach that watches you through your camera and tells you, out loud, the one thing to fix in your form while you train.',
+    q: 'Does my video get uploaded?',
+    a: "No. Tracking and coaching run in your browser, and nothing from your camera gets sent anywhere. The one exception is the AI coach for sports that don't have their own rules yet: it sends three small frames from each rep to Google's Gemini model to write the cue.",
   },
   {
-    q: 'is my video stored?',
-    a: "No. Pose tracking runs in your browser. Every few seconds one small still frame is sent to a vision model to write the cue, and Acuity Kinetic doesn't save it.",
+    q: 'What do I need?',
+    a: 'A laptop or phone with a camera, and Chrome. For full-body drills, stand about 2.5 to 3 m (8 to 10 ft) back so your feet are in frame.',
   },
   {
-    q: 'which sports does it work for?',
-    a: `Right now: ${sportList}. It works best for movements you can do in front of a camera, like shooting form, stances and lifts.`,
+    q: 'How accurate is it?',
+    a: "It's only as good as what the camera can see. Side-on, in good light, with your whole body in frame works best. If a joint is hidden, it skips that check and shows \"not visible\" instead of guessing.",
   },
   {
-    q: 'do I need to download anything?',
-    a: 'No. It runs in your browser on a laptop or phone. Chrome works best.',
+    q: "My sport isn't listed. Can I still use it?",
+    a: "Yes, with the AI coach, which works for any sport. It's slower and less exact than the drills that have their own rules.",
   },
   {
-    q: 'how much does it cost?',
-    a: 'The demo is free. Pro pricing comes at launch, and everyone on the waitlist gets their first month free.',
+    q: 'Is the posture product medical advice?',
+    a: "No. It tracks a habit: how you sit. If something hurts, see a doctor or a physical therapist.",
+  },
+  {
+    q: 'What does it cost?',
+    a: "It's free while it's in beta. Everyone on the waitlist gets their first month of Pro free when it launches.",
   },
 ];
 
 export default function Faq() {
   return (
     <section id="faq" className="px-5 py-20 sm:px-8 sm:py-28">
-      <div className="mx-auto grid max-w-page gap-10 lg:grid-cols-[1fr_1.6fr] lg:gap-16">
-        <h2 className="text-section font-semibold">questions.</h2>
+      <div className="mx-auto grid max-w-page grid-cols-[minmax(0,1fr)] gap-10 lg:grid-cols-[1fr_1.6fr] lg:gap-16">
+        <h2 className="text-section font-semibold">Questions</h2>
 
         <div className="border-t border-ink">
           {QUESTIONS.map(({ q, a }) => (

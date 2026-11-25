@@ -1,16 +1,14 @@
 import { useCallback, useRef, useState } from 'react';
 import Nav from './components/Nav.jsx';
 import Hero from './components/Hero.jsx';
+import Products from './components/Products.jsx';
 import HowItWorks from './components/HowItWorks.jsx';
-import Demo from './components/Demo.jsx';
 import FounderNote from './components/FounderNote.jsx';
 import Faq from './components/Faq.jsx';
 import Footer from './components/Footer.jsx';
 import Toast from './components/Toast.jsx';
-import { SPORTS } from './utils/sports.js';
 
 export default function App() {
-  const [selectedSport, setSelectedSport] = useState('Basketball');
   const [toast, setToast] = useState(null);
   const toastTimer = useRef();
 
@@ -29,20 +27,13 @@ export default function App() {
         Skip to content
       </a>
       <Nav />
-
       <main id="main">
         <Hero />
+        <Products />
         <HowItWorks />
-        <Demo
-          sports={SPORTS}
-          selectedSport={selectedSport}
-          onSportChange={setSelectedSport}
-          showToast={showToast}
-        />
         <FounderNote showToast={showToast} />
         <Faq />
       </main>
-
       <Footer />
       <Toast toast={toast} />
     </div>

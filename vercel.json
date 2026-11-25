@@ -1,0 +1,3 @@
+{
+  "rewrites": [{ "source": "/try", "destination": "/try/index.html" }]
+}

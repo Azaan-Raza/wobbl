@@ -1,3 +1,4 @@
+import { resolve } from 'node:path';
 import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 
@@ -45,5 +46,14 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [react(), devApi()],
+    build: {
+      rollupOptions: {
+        // Two pages: the site and the app at /try/.
+        input: {
+          main: resolve(process.cwd(), 'index.html'),
+          try: resolve(process.cwd(), 'try/index.html'),
+        },
+      },
+    },
   };
 });

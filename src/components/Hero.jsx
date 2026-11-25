@@ -1,34 +1,33 @@
-import HeroSession from './HeroSession.jsx';
+import HeroScenes from './HeroScenes.jsx';
 
 export default function Hero() {
   return (
-    <section id="top" className="px-5 pb-24 pt-32 sm:px-8 sm:pt-40">
-      <div className="mx-auto max-w-3xl text-center">
-        <p className="inline-flex items-center gap-2 rounded-full border border-hairline bg-white px-3.5 py-1.5 text-[13px] text-muted">
-          <span className="h-1.5 w-1.5 rounded-full bg-accent-ink" />
-          now in private beta
-        </p>
-
-        <h1 className="mt-7 text-hero font-semibold">a coach that watches you train.</h1>
-
-        <p className="mx-auto mt-6 max-w-xl text-lead text-muted">
-          Point your camera at yourself, pick your sport, and hear one short correction at a time,
-          while you're still moving.
+    <section id="top" className="px-5 pb-20 pt-32 sm:px-8 sm:pt-40">
+      <div className="mx-auto max-w-4xl text-center">
+        <h1 className="text-hero font-semibold [text-wrap:balance]">
+          Your camera watches how you move and tells you what to fix.
+        </h1>
+        <p className="mx-auto mt-7 max-w-2xl text-lead text-muted [text-wrap:pretty]">
+          It runs in your browser, measures your joints on every frame, and speaks up when the
+          same mistake keeps showing up. Right now it coaches lifting, basketball, Tae Kwon Do,
+          piano, guitar and sitting posture.
         </p>
 
         <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
-          <a href="#demo" className="pill-dark w-full sm:w-auto">
-            try it in your browser
+          <a href="/try/" className="pill-dark w-full sm:w-auto">
+            Open the app
           </a>
           <a href="#waitlist" className="pill-outline w-full sm:w-auto">
-            join the waitlist
+            Join the waitlist
           </a>
         </div>
-        <p className="mt-4 text-[13px] text-muted">Free. No download. Works best in Chrome.</p>
+        <p className="mt-4 text-[13px] text-muted">
+          Free while it's in beta. Works best in Chrome on a laptop.
+        </p>
       </div>
 
       <div className="mt-16 sm:mt-20">
-        <HeroSession />
+        <HeroScenes />
       </div>
     </section>
   );

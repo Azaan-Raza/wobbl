@@ -1,8 +1,9 @@
 const LINKS = [
-  { label: 'how it works', href: '#how-it-works' },
-  { label: 'demo', href: '#demo' },
-  { label: 'waitlist', href: '#waitlist' },
-  { label: 'faq', href: '#faq' },
+  { label: 'Products', href: '#products' },
+  { label: 'How it works', href: '#how-it-works' },
+  { label: 'Open the app', href: '/try/' },
+  { label: 'Waitlist', href: '#waitlist' },
+  { label: 'FAQ', href: '#faq' },
 ];
 
 export default function Footer() {
@@ -13,7 +14,7 @@ export default function Footer() {
           <a href="#top" className="text-3xl font-semibold tracking-tight">
             acuity kinetic
           </a>
-          <p className="mt-2 text-[15px] text-muted">for athletes, by an athlete.</p>
+          <p className="mt-2 text-[15px] text-muted">For athletes, by an athlete.</p>
         </div>
 
         <nav aria-label="Footer" className="flex flex-wrap gap-x-8 gap-y-3 text-[15px]">

@@ -1,34 +1,55 @@
-// Everything about how a cue is asked for, shared by the server function in
-// /api/coach.js. Kept out of the client so the prompt and key handling live in
-// one place on the server.
+// How the AI coach asks Gemini for a cue. Used only by the server function in
+// /api/coach.js, so the prompt and key handling stay in one place.
 export const DEFAULT_MODEL = 'gemini-2.5-flash-lite';
 
-export const systemPrompt = (sport) => `You are an elite ${sport} coach analyzing a single frame from a live video feed of an athlete training.
+const ANGLE_NAMES = {
+  kneeL: 'left knee',
+  kneeR: 'right knee',
+  hipL: 'left hip',
+  hipR: 'right hip',
+  elbowL: 'left elbow',
+  elbowR: 'right elbow',
+  armRaiseL: 'left arm raise',
+  armRaiseR: 'right arm raise',
+  trunkLean: 'torso lean from vertical',
+};
 
-Your job is to give ONE piece of concise, actionable coaching feedback based on what you can see in the image. Focus on body mechanics, posture, form, positioning, or technique, whichever matters most in this frame.
+export const systemPrompt = (sport) => `You are an experienced ${sport} coach watching an athlete train through a camera.
+
+You get one repetition as a single image: three frames side by side, left to right, from the start of the movement, its fastest point, and the end. You also get joint angles measured by pose tracking at those three moments. 180 degrees means a straight joint.
+
+Give ONE correction, the one that would help this athlete most right now.
 
 Rules:
-- Maximum 1 sentence. 15 words or fewer.
-- Be specific and direct, like a real coach would speak out loud.
-- If the image is unclear, dark, or shows no athlete, respond only with: "Adjust your camera position."
-- Do not use filler phrases like "Great job" or "Keep it up."
-- Do not explain what you're doing. Just give the feedback.
-- Use plain punctuation. Do not use em dashes.
+- One sentence, 15 words or fewer, the way a coach would say it out loud.
+- Be specific about the body part and what to change.
+- Trust the measured angles over your own read of a blurry frame.
+- If the frames don't show an athlete clearly, reply only: "I couldn't see that rep clearly."
+- No praise, no filler, no explanations. No em dashes.`;
 
-Example outputs:
-- "Drive your elbow in closer on the release."
-- "Bend your knees more on landing."
-- "Keep your back straight through the lift."
-- "Weight is too far forward, shift back to your heels."`;
+// metrics = { angles: [ {kneeL: 120, ...}, {...}, {...} ] }
+export function describeMetrics(metrics) {
+  const labels = ['start', 'fastest point', 'end'];
+  return (metrics?.angles || [])
+    .slice(0, 3)
+    .map((frame, i) => {
+      const parts = Object.entries(frame || {})
+        .filter(([k, v]) => ANGLE_NAMES[k] && Number.isFinite(v))
+        .map(([k, v]) => `${ANGLE_NAMES[k]} ${Math.round(v)}`);
+      return `${labels[i]}: ${parts.join(', ') || 'not measured'}`;
+    })
+    .join('\n');
+}
 
-export function buildGeminiBody(base64Frame, sport) {
+export function buildGeminiBody(image, sport, metrics) {
+  const angles = describeMetrics(metrics);
+  const text = angles
+    ? `Sport: ${sport}.\nMeasured angles in degrees:\n${angles}\n\nGive me one coaching cue for this rep.`
+    : `Sport: ${sport}. Give me one coaching cue for this rep.`;
   return {
     contents: [
       {
-        parts: [
-          { inline_data: { mime_type: 'image/jpeg', data: base64Frame } },
-          { text: `Analyze this frame. I am training ${sport}. Give me one coaching cue.` },
-        ],
+        parts: [{ inline_data: { mime_type: 'image/jpeg', data: image } }, { text }],
       },
     ],
     systemInstruction: { parts: [{ text: systemPrompt(sport) }] },
@@ -45,6 +66,5 @@ export function buildGeminiBody(base64Frame, sport) {
 export function extractCue(data) {
   const text = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
   if (!text) return null;
-  // Strip wrapping quotes the model may add around a short cue.
   return text.replace(/^["']|["']$/g, '');
 }

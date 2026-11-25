@@ -1,4 +1,8 @@
-// POST /api/coach  { frame: <base64 JPEG>, sport: <one of SPORTS> } -> { cue }
+// POST /api/coach  { image: <base64 JPEG>, sport: <one of SPORTS>, metrics? } -> { cue }
+//
+// Used by the AI coach for sports that don't have their own rules yet. The
+// image holds three frames from one rep; metrics holds joint angles measured
+// on the device at those frames.
 //
 // Runs on the server (a Vercel function in production, Vite middleware in dev),
 // so the Gemini key never reaches the browser. Set GEMINI_API_KEY in Vercel's
@@ -7,8 +11,8 @@ import { SPORTS } from '../src/utils/sports.js';
 import { DEFAULT_MODEL, buildGeminiBody, extractCue } from '../src/utils/coachPrompt.js';
 
 const REQUEST_TIMEOUT_MS = 8000;
-// A 640px JPEG at quality 0.7 is well under this; anything bigger is not ours.
-const MAX_FRAME_CHARS = 1_500_000;
+// Three 320px frames at quality 0.7 are well under this; anything bigger is not ours.
+const MAX_IMAGE_CHARS = 1_500_000;
 
 function sameOrigin(req) {
   const origin = req.headers.origin;
@@ -38,12 +42,16 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'Server is missing GEMINI_API_KEY.' });
   }
 
-  const { frame, sport } = req.body || {};
-  if (typeof frame !== 'string' || frame.length === 0 || frame.length > MAX_FRAME_CHARS) {
-    return res.status(400).json({ error: 'Send one JPEG frame as base64 in "frame".' });
+  const { sport, metrics } = req.body || {};
+  const image = req.body?.image ?? req.body?.frame;
+  if (typeof image !== 'string' || image.length === 0 || image.length > MAX_IMAGE_CHARS) {
+    return res.status(400).json({ error: 'Send one JPEG as base64 in "image".' });
   }
   if (!SPORTS.includes(sport)) {
     return res.status(400).json({ error: 'Unknown sport.' });
+  }
+  if (metrics != null && !validMetrics(metrics)) {
+    return res.status(400).json({ error: 'Metrics must be { angles: [up to 3 objects of numbers] }.' });
   }
 
   const model = process.env.COACH_MODEL || process.env.VITE_COACH_MODEL || DEFAULT_MODEL;
@@ -56,7 +64,7 @@ export default async function handler(req, res) {
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key },
-        body: JSON.stringify(buildGeminiBody(frame, sport)),
+        body: JSON.stringify(buildGeminiBody(image, sport, metrics)),
         signal: controller.signal,
       }
     );
@@ -74,4 +82,15 @@ export default async function handler(req, res) {
   } finally {
     clearTimeout(timeout);
   }
+}
+
+function validMetrics(m) {
+  if (typeof m !== 'object' || !Array.isArray(m.angles) || m.angles.length > 3) return false;
+  return m.angles.every(
+    (a) =>
+      a &&
+      typeof a === 'object' &&
+      Object.keys(a).length <= 12 &&
+      Object.values(a).every((v) => typeof v === 'number' && Number.isFinite(v))
+  );
 }

@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 
 const LINKS = [
-  { label: 'how it works', href: '#how-it-works' },
-  { label: 'demo', href: '#demo' },
-  { label: 'faq', href: '#faq' },
+  { label: 'Products', href: '#products' },
+  { label: 'How it works', href: '#how-it-works' },
+  { label: 'FAQ', href: '#faq' },
 ];
 
 // Fixed top bar. Transparent over the hero, then a soft blurred paper
@@ -41,8 +41,8 @@ export default function Nav() {
           ))}
         </div>
 
-        <a href="#waitlist" className="pill-outline px-5 py-2 text-sm">
-          join the waitlist
+        <a href="/try/" className="pill-dark px-5 py-2 text-sm">
+          Open the app
         </a>
       </nav>
     </header>
