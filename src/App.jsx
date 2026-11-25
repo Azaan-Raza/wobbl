@@ -3,6 +3,7 @@ import Nav from './components/Nav.jsx';
 import Hero from './components/Hero.jsx';
 import Products from './components/Products.jsx';
 import HowItWorks from './components/HowItWorks.jsx';
+import UnderTheHood from './components/UnderTheHood.jsx';
 import FounderNote from './components/FounderNote.jsx';
 import Faq from './components/Faq.jsx';
 import Footer from './components/Footer.jsx';
@@ -22,7 +23,7 @@ export default function App() {
     <div className="min-h-screen bg-paper font-sans text-ink">
       <a
         href="#main"
-        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[200] focus:rounded-full focus:bg-white focus:px-4 focus:py-2"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[200] focus:bg-white focus:px-4 focus:py-2"
       >
         Skip to content
       </a>
@@ -31,6 +32,7 @@ export default function App() {
         <Hero />
         <Products />
         <HowItWorks />
+        <UnderTheHood />
         <FounderNote showToast={showToast} />
         <Faq />
       </main>

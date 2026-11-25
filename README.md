@@ -1,6 +1,6 @@
 # wobbl
 
-wobbl catches the wobble in your form and tells you what to fix.
+Your form, measured on every rep.
 
 (Formerly Acuity Kinetic.) wobbl tracks your body (and hands, for music) in the browser, measures joint angles on every frame, checks each rep or held position against rules for that drill, and says one correction out loud when the same mistake keeps showing up.
 
@@ -19,8 +19,17 @@ camera ──> MediaPipe pose (33 points) + hands (21 points each), on device, u
        ──> drill: rep segmenter (squat, jump shot) or hold window (stance, posture, music)
        ──> checks: each one measures a value and compares it to a target
        ──> coach: decides whether to speak, what to say, and when to praise a fix
-       ──> speech, overlay with red joints, live numbers, session report
+       ──> speech, overlay with red joints and a live angle, live numbers, session report
 ```
+
+On top of the cues, every session also gets:
+
+- **A camera check** that runs on every frame: whole body in frame, distance (too far, too close, at the edge), camera angle, and how confident the tracking is. It tells you how to fix whatever fails and keeps coaching meanwhile.
+- **Rep timing**: each rep is split into the way down, the pause and the way up, with the speed of the working phase.
+- **Sets and fatigue**: a pause of 20 seconds starts a new set. When the last two reps in a set are 25% slower than the set's best, it tells you to rest (velocity-based training, measured at the knee).
+- **Balance**: facing the camera, a squat that shifts toward one side gets flagged.
+- **A live angle on the joint** that matters for the drill, red when its check is failing.
+- **A report** with score and speed per rep, rep-to-rep spread for every check, a form-over-time chart for held positions, a replay of your best and worst rep side by side, and CSV or JSON export.
 
 The coach only cues a mistake after it shows up in 2 of the last 3 reps (or lasts long enough in a held position), says one thing at a time, won't repeat a cue for at least 15 seconds, and tells you when you've fixed it. Every rep gets a score out of 100 from the weights of the checks it failed.
 
@@ -35,13 +44,17 @@ src/engine/        pure logic, no DOM: runs the same in the browser and in tests
   filters.js       One Euro filter for landmark smoothing
   features.js      landmarks -> named measurements; camera-angle detection; hand matching
   segment.js       RepSegmenter (rep drills) and HoldWindow (held positions)
-  coach.js         turns frames into events: hint, calibrating, rep, cue, praise
+  coach.js         turns frames into events: hint, calibrating, rep, cue, praise, fatigue, set
+  kinematics.js    rep phases and speed, velocity loss, rep-to-rep spread
+  setup.js         the camera check
   motion.js        movement bursts for the AI coach
   history.js       session history in localStorage
 src/drills/        one file per product; each drill is data plus small measure/fault functions
 src/tracking/      MediaPipe wrapper, overlay drawing, frame buffer for the AI coach
 src/app/           the app at /try/: picker, setup, live view, report, session runner
-src/components/    the marketing site, including the wobbl mascot (Wobbl.jsx)
+src/components/    the marketing site; Logo.jsx holds the mark, figures.jsx the product drawings
+src/utils/exportSession.js   CSV and JSON export
+brand/             logo files (mark, lockups, outlined wordmark)
 api/coach.js       server function for the AI coach (holds the Gemini key)
 test/              unit and coaching tests on synthetic poses with known angles
 ```
@@ -64,7 +77,11 @@ A drill is an object in `src/drills/`. Pick `mode: 'rep'` (with a signal that di
 }
 ```
 
-Then add a synthetic test in `test/coach.test.js` that feeds good and bad versions of the movement.
+Then add a synthetic test in `test/coach.test.js` that feeds good and bad versions of the movement. Optional fields: `frame` ('full', 'upper' or 'hands') for the camera check, `live` for the angle drawn on the joint, and in `rep`, `power`, `fatigue` and `phases` for timing.
+
+## Brand
+
+`BRAND.md` covers color, type, logo, components, layout and voice. The short version: white, flat and square, Archivo set wide for headlines, cobalt `#2346F5` for anything tracked or in range, and signal red `#D13A22` only for faults.
 
 ## Running it locally
 
@@ -74,10 +91,10 @@ You need Node 18 or newer.
 npm install
 cp .env.example .env   # paste your Gemini key into GEMINI_API_KEY (only the AI coach uses it)
 npm run dev            # site at http://localhost:5173, app at http://localhost:5173/try/
-npm test               # engine and coaching tests
+npm test               # engine, coaching and camera-check tests (40)
 ```
 
-Use Chrome. The first session takes a few seconds while the tracking models download. Fonts (Inter, Caveat, Geist Mono) are bundled, so nothing loads from Google Fonts.
+Use Chrome. The first session takes a few seconds while the tracking models download. The font (Archivo) is bundled, so nothing loads from Google Fonts.
 
 ## Environment variables
 

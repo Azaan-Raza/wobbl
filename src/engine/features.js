@@ -70,6 +70,24 @@ function poseFeatures(pose, world) {
       ? 'side'
       : null;
 
+  // The side nearer the camera, by landmark confidence. In a side view the far
+  // leg is often hidden or guessed, so single-leg readouts use this side.
+  const vis = (...ids) => ids.reduce((sum, i) => sum + (pose[i]?.visibility ?? 0), 0);
+  f.nearSide =
+    vis(P.leftHip, P.leftKnee, P.leftAnkle) >= vis(P.rightHip, P.rightKnee, P.rightAnkle) ? 'L' : 'R';
+  f.kneeNear = f[`knee${f.nearSide}`] ?? f.knee;
+
+  // Front view only: how far the hips sit to one side of the feet, in hip
+  // widths. Signed, positive = toward image right. In a side view the hips
+  // overlap and this would be meaningless, so it stays empty.
+  if (f.view === 'front' && hips && f.hipWidth && ok(P.leftAnkle, P.rightAnkle)) {
+    const feet = mid(pose[P.leftAnkle], pose[P.rightAnkle]);
+    f.hipShift = (hips.x - feet.x) / f.hipWidth;
+  } else {
+    f.hipShift = null;
+  }
+  f.kneeGap = f.kneeL != null && f.kneeR != null ? Math.abs(f.kneeL - f.kneeR) : null;
+
   // Which way the athlete faces in a side view: +1 = toward image right.
   f.facing = shoulders && ok(P.nose) ? Math.sign(pose[P.nose].x - shoulders.x) || 1 : null;
 

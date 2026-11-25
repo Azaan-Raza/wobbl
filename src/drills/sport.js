@@ -1,4 +1,4 @@
-import { P } from '../engine/landmarks.js';
+import { ANGLES, P } from '../engine/landmarks.js';
 
 const seconds = (v) => `${v.toFixed(1)} s`;
 const share = (v) => `${Math.round(v * 100)}%`;
@@ -20,7 +20,24 @@ export const squat = {
     [P.leftAnkle, P.rightAnkle],
   ],
   missingHint: 'Step back until your feet are in the frame.',
-  rep: { signal: 'knee', direction: 'down', rest: 155, active: 140, minMs: 500 },
+  frame: 'full',
+  rep: {
+    signal: 'knee',
+    direction: 'down',
+    rest: 155,
+    active: 140,
+    minMs: 500,
+    power: 'back', // standing up is the working phase
+    fatigue: true,
+    phases: ['down', 'bottom', 'up'],
+    speedUnit: 'knee, degrees per second',
+  },
+  live: {
+    check: 'depth',
+    label: 'knee',
+    arc: (f) => ANGLES.knee[f.nearSide],
+    read: (f) => f.kneeNear,
+  },
   checks: [
     {
       id: 'depth',
@@ -72,11 +89,28 @@ export const squat = {
       joints: [P.leftKnee, P.rightKnee],
     },
     {
+      id: 'balance',
+      label: 'Even weight',
+      views: ['front'],
+      measure: (rep) => {
+        const v = rep.at('hipShift');
+        return v == null ? null : Math.abs(v);
+      },
+      fault: (v) => v > 0.2,
+      format: (v) => `${share(v)} of hip width`,
+      target: 'hips shift under 20%',
+      weight: 15,
+      cue: "You're shifting to one side. Keep your weight even on both feet.",
+      fixed: 'Weight is even now.',
+      joints: [P.leftHip, P.rightHip],
+    },
+    {
       id: 'tempo',
       label: 'Lowering speed',
       measure: (rep) => rep.toExtremeMs / 1000,
       fault: (v) => v < 0.6,
       format: seconds,
+      spreadFormat: (v) => `±${v.toFixed(1)} s`,
       target: '0.6 s or slower down',
       weight: 10,
       cue: 'Slow down on the way down. Control it.',
@@ -127,7 +161,24 @@ export const jumpShot = {
     const wrist = f.pose[s.hand === 'left' ? P.leftWrist : P.rightWrist];
     f.elbowFlare = f.shoulderWidth ? Math.abs(elbow.x - wrist.x) / f.shoulderWidth : null;
   },
-  rep: { signal: 'shotLift', direction: 'up', rest: 0.15, active: 0.75, minMs: 300, prerollMs: 1200 },
+  frame: 'full',
+  rep: {
+    signal: 'shotLift',
+    direction: 'up',
+    rest: 0.15,
+    active: 0.75,
+    minMs: 300,
+    prerollMs: 1200,
+    power: 'toward', // the rise into the release
+    phases: ['rise', 'release', 'drop'],
+    speedUnit: 'wrist, torso lengths per second',
+  },
+  live: {
+    check: 'extension',
+    label: 'elbow',
+    arc: (f, s) => ANGLES.elbow[s.hand === 'left' ? 'L' : 'R'],
+    read: (f) => f.shotElbow,
+  },
   checks: [
     {
       id: 'legs',
@@ -199,10 +250,18 @@ export const frontStance = {
     const ra = f.pose[P.rightAnkle];
     const front = (la.x - ra.x) * f.facing > 0 ? 'L' : 'R';
     const back = front === 'L' ? 'R' : 'L';
+    f.frontSide = front;
     f.frontKnee = f[`knee${front}`];
     f.backKnee = f[`knee${back}`];
     f.backHeelLift = f[`heelLift${back}`];
     f.stanceLength = f.torsoLength ? Math.abs(la.x - ra.x) / f.torsoLength : null;
+  },
+  frame: 'full',
+  live: {
+    check: 'frontKnee',
+    label: 'front knee',
+    arc: (f) => (f.frontSide ? ANGLES.knee[f.frontSide] : null),
+    read: (f) => f.frontKnee,
   },
   inPosition: (ctx) => (ctx.get('stanceLength') ?? 0) > 0.6,
   positionHint: 'Step into your front stance and hold it.',

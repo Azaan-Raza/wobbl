@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import WindowBar from './WindowBar.jsx';
 import { hasJoinedWaitlist, joinWaitlist, markWaitlistJoined } from '../utils/waitlist.js';
 
 // The founder's letter and the waitlist live together: the note is the reason
@@ -35,14 +34,15 @@ export default function FounderNote({ showToast }) {
   };
 
   return (
-    <section id="waitlist" className="px-5 py-20 sm:px-8 sm:py-28">
-      <div className="window mx-auto max-w-2xl">
-        <WindowBar title="a note from the founder" />
+    <section id="waitlist" className="border-t border-rule px-5 py-24 sm:px-8 sm:py-32">
+      <div className="mx-auto grid max-w-page grid-cols-[minmax(0,1fr)] gap-12 lg:grid-cols-12 lg:gap-10">
+        <div className="lg:col-span-4">
+          <p className="text-[15px] text-muted">A note from the founder</p>
+          <h2 className="display mt-3 text-section">Hey, I'm Azaan.</h2>
+        </div>
 
-        <div className="px-6 py-10 sm:px-12 sm:py-14">
-          <h2 className="text-4xl font-semibold tracking-tight sm:text-5xl">hey, i'm azaan.</h2>
-
-          <div className="mt-7 space-y-5 text-lg leading-relaxed text-[#2B2B2B]">
+        <div className="lg:col-span-7 lg:col-start-6">
+          <div className="space-y-5 text-[1.1875rem] leading-relaxed">
             <p>
               I'm a sophomore in high school and I've played sports my whole life: basketball, Tae
               Kwon Do, soccer, tennis, swimming, you name it. So many times I'd walk off the court or
@@ -59,9 +59,9 @@ export default function FounderNote({ showToast }) {
           </div>
 
           <p className="mt-8 font-semibold">Azaan</p>
-          <p className="text-[15px] text-muted">founder, wobbl</p>
+          <p className="text-[15px] text-muted">Founder, wobbl</p>
 
-          <div className="mt-10 border-t border-hairline pt-8">
+          <div className="mt-12 border border-rule p-6 sm:p-8">
             {joined ? (
               <p className="text-lg">
                 You're on the list. I'll email you when your spot opens, and your first month of Pro is on
@@ -74,7 +74,7 @@ export default function FounderNote({ showToast }) {
                 </p>
                 <p className="mt-1 text-[15px] text-muted">No credit card needed. You'll get one email when your spot opens.</p>
 
-                <form onSubmit={submit} className="mt-6 flex flex-col gap-3 sm:flex-row">
+                <form onSubmit={submit} className="mt-6 flex flex-col gap-3 sm:flex-row sm:gap-0">
                   <label htmlFor="waitlist-email" className="sr-only">
                     Email address
                   </label>
@@ -88,8 +88,8 @@ export default function FounderNote({ showToast }) {
                     disabled={submitting}
                     className="field flex-1"
                   />
-                  <button type="submit" disabled={submitting} className="pill-dark">
-                    {submitting ? 'adding you…' : 'join the waitlist'}
+                  <button type="submit" disabled={submitting} className="btn-primary">
+                    {submitting ? 'Adding you…' : 'Join the waitlist'}
                   </button>
                 </form>
               </>

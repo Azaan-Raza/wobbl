@@ -1,52 +1,46 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import { Square } from 'lucide-react';
-import WindowBar from '../components/WindowBar.jsx';
-import Wobbl from '../components/Wobbl.jsx';
+import { Check, Square, X } from 'lucide-react';
+import { Mark } from '../components/Logo.jsx';
 
 const clock = (ms) => {
   const s = Math.floor((ms ?? 0) / 1000);
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 };
+const secs = (ms) => (ms == null ? '–' : `${(ms / 1000).toFixed(1)} s`);
 
-const FEED_STYLE = {
-  cue: 'border-ink bg-white',
-  praise: 'border-[#0B7A3E]/40 bg-[#F1FAF4]',
-  hint: 'border-hairline bg-paper',
-  note: 'border-hairline bg-paper',
-  error: 'border-[#B3261E]/30 bg-[#FFF4F3]',
+const FEED = {
+  cue: { label: 'Fix', mark: 'bg-signal' },
+  praise: { label: 'Fixed', mark: 'bg-cobalt' },
+  rest: { label: 'Rest', mark: 'bg-ink' },
+  hint: { label: 'Setup', mark: 'bg-line' },
+  note: { label: 'Note', mark: 'bg-line' },
+  error: { label: 'Problem', mark: 'bg-signal' },
 };
 
-const FEED_LABEL = {
-  cue: 'Fix',
-  praise: 'Fixed',
-  hint: 'Setup',
-  note: 'Note',
-  error: 'Problem',
-};
-
-export default function LivePanel({
-  drill,
-  videoRef,
-  canvasRef,
-  status,
-  snap,
-  lastRep,
-  feed,
-  calibration,
-  onStop,
-}) {
+export default function LivePanel({ drill, videoRef, canvasRef, status, snap, lastRep, feed, calibration, onStop }) {
   const hold = drill.mode === 'hold';
   const ai = drill.mode === 'ai';
   const results = hold ? snap?.results || [] : lastRep?.results || [];
   const lost = snap && !snap.tracking;
+  const setup = snap?.setup;
+  const view = setup?.items.find((i) => i.id === 'angle')?.value;
+  const tracking = setup?.items.find((i) => i.id === 'tracking')?.value;
+  const phases = drill.rep?.phases || ['down', 'bottom', 'up'];
 
   return (
-    <div className="grid grid-cols-[minmax(0,1fr)] gap-6 xl:grid-cols-[minmax(0,1.6fr)_minmax(300px,1fr)]">
-      <div className="window min-w-0 self-start">
-        <WindowBar title={`live: ${drill.name}`}>
-          <span className="font-mono text-xs text-muted">{clock(snap?.elapsedMs)}</span>
-        </WindowBar>
-        <div className="relative aspect-video bg-stage">
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-5 xl:grid-cols-[minmax(0,1.65fr)_minmax(320px,1fr)]">
+      <div className="panel min-w-0 self-start">
+        <div className="panel-bar justify-between">
+          <div className="flex min-w-0 items-center gap-2.5 text-[14px]">
+            <Mark size={18} />
+            <span className="truncate font-medium">{drill.name}</span>
+          </div>
+          <span className="text-[13px] tabular-nums text-muted">
+            {!hold && !ai && snap?.set > 1 ? `Set ${snap.set}  ` : ''}
+            {clock(snap?.elapsedMs)}
+          </span>
+        </div>
+        <div className="relative aspect-video bg-screen">
           <video
             ref={videoRef}
             playsInline
@@ -62,39 +56,58 @@ export default function LivePanel({
             style={{ transform: 'scaleX(-1)' }}
           />
 
+          {!status && snap && (
+            <div className="absolute left-3 top-3 flex flex-wrap gap-1.5 text-[12px] font-medium">
+              <span className="flex items-center gap-1.5 bg-ink/90 px-2 py-1 text-white">
+                <span className="h-1.5 w-1.5 bg-signal" aria-hidden="true" />
+                Live
+              </span>
+              {view && view !== 'unknown' && (
+                <span className="bg-white/90 px-2 py-1 text-ink">{view[0].toUpperCase() + view.slice(1)}</span>
+              )}
+              {tracking && <span className="bg-white/90 px-2 py-1 text-ink">Tracking {tracking}</span>}
+            </div>
+          )}
+
           {status && (
-            <div className="absolute inset-0 flex items-center justify-center bg-stage/90 p-6 text-center">
-              <p className="max-w-xs text-sm text-white/80">{status}</p>
+            <div className="absolute inset-0 flex items-center justify-center bg-screen/90 p-6 text-center">
+              <p className="max-w-xs text-sm text-white/85">{status}</p>
             </div>
           )}
 
           {calibration != null && (
-            <div className="absolute inset-x-0 bottom-0 bg-black/70 px-5 py-4 text-white">
-              <p className="text-sm font-medium">Hold your best posture. Measuring your baseline…</p>
-              <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/20">
-                <div className="h-full rounded-full bg-accent" style={{ width: `${Math.round(calibration * 100)}%` }} />
+            <div className="absolute inset-x-0 bottom-0 bg-ink/85 px-5 py-4 text-white">
+              <p className="text-sm font-medium">Hold your best posture. Saving your baseline…</p>
+              <div className="mt-2 h-1 bg-white/20">
+                <div className="h-full bg-cobalt" style={{ width: `${Math.round(calibration * 100)}%` }} />
               </div>
             </div>
           )}
 
           {lost && !status && (
-            <p className="absolute left-1/2 top-3 -translate-x-1/2 rounded-full bg-black/70 px-3 py-1 text-xs font-medium text-white">
+            <p className="absolute left-1/2 top-3 -translate-x-1/2 bg-ink/90 px-3 py-1 text-xs font-medium text-white">
               Can't see you right now
             </p>
           )}
         </div>
         <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
           <p className="text-[13px] text-muted">
-            {ai ? 'Pause for a second between reps so it can tell them apart.' : 'Red joints are what the last cue was about.'}
+            {ai
+              ? 'Pause for a second between reps so it can tell them apart.'
+              : drill.live
+                ? 'The angle on your joint is live. Red means the last check on it failed.'
+                : 'Red joints are what the last cue was about.'}
           </p>
-          <button type="button" onClick={onStop} className="pill-dark py-2 text-sm">
-            <Square className="h-3.5 w-3.5" fill="currentColor" /> stop and see report
+          <button type="button" onClick={onStop} className="btn-primary btn-sm">
+            <Square className="h-3.5 w-3.5" fill="currentColor" /> Stop and see report
           </button>
         </div>
       </div>
 
-      <div className="flex min-w-0 flex-col gap-6">
-        <section className="window p-5">
+      <div className="flex min-w-0 flex-col gap-5">
+        {setup && !ai && <CameraCheck setup={setup} />}
+
+        <section className="panel p-5">
           <div className="grid grid-cols-2 gap-4">
             <Stat
               label={hold ? 'In good form' : 'Reps'}
@@ -103,29 +116,50 @@ export default function LivePanel({
             <Stat
               label={hold ? 'Right now' : 'Last rep score'}
               value={
-                ai
-                  ? '–'
-                  : hold
-                    ? snap?.score != null ? `${snap.score}` : '–'
-                    : lastRep?.score != null ? `${lastRep.score}` : '–'
+                ai ? '–' : hold ? (snap?.score != null ? `${snap.score}` : '–') : lastRep?.score != null ? `${lastRep.score}` : '–'
               }
               suffix={!ai && (hold ? snap?.score != null : lastRep?.score != null) ? '/100' : ''}
             />
           </div>
 
+          {!hold && !ai && lastRep?.kin && (
+            <div className="mt-4 grid grid-cols-3 border-y border-rule text-[13px]">
+              {[
+                [phases[0], lastRep.kin.towardMs],
+                [phases[1], lastRep.kin.holdMs],
+                [phases[2], lastRep.kin.backMs],
+              ].map(([label, ms]) => (
+                <div key={label} className="border-r border-rule py-2 pl-0 pr-2 last:border-r-0 [&:not(:first-child)]:pl-3">
+                  <p className="capitalize text-muted">{label}</p>
+                  <p className="mt-0.5 text-[15px] tabular-nums">{secs(ms)}</p>
+                </div>
+              ))}
+            </div>
+          )}
+          {!hold && !ai && lastRep?.loss != null && drill.rep?.fatigue && (
+            <p className="mt-3 text-[13px] text-muted">
+              Speed vs your best rep this set:{' '}
+              <span className={`tabular-nums ${lastRep.loss >= 0.25 ? 'font-medium text-signal' : 'text-ink'}`}>
+                {Math.round((1 - lastRep.loss) * 100)}%
+              </span>
+            </p>
+          )}
+
           {results.length > 0 && (
-            <ul className="mt-5 divide-y divide-hairline border-t border-hairline">
+            <ul className="mt-4 divide-y divide-rule border-t border-rule">
               {results.map((r) => (
                 <li key={r.id} className="flex items-center gap-3 py-2.5 text-[14px]">
                   <span
-                    className={`h-2.5 w-2.5 shrink-0 rounded-full ${
-                      r.skipped ? 'bg-hairline' : r.fault ? 'bg-[#FF453A]' : 'bg-[#16A34A]'
-                    }`}
-                    aria-label={r.skipped ? 'not checked' : r.fault ? 'needs work' : 'good'}
+                    className={`h-2 w-2 shrink-0 ${r.skipped ? 'bg-rule' : r.fault ? 'bg-signal' : 'bg-cobalt'}`}
+                    aria-label={r.skipped ? 'not checked' : r.fault ? 'off' : 'in range'}
                   />
                   <span className="min-w-0 flex-1">{r.label}</span>
                   <span className="text-right tabular-nums">
-                    {r.skipped ? <span className="text-muted">{skipReason(r)}</span> : r.display}
+                    {r.skipped ? (
+                      <span className="text-muted">{skipReason(r)}</span>
+                    ) : (
+                      <span className={r.fault ? 'font-medium text-signal' : ''}>{r.display}</span>
+                    )}
                     {!r.skipped && <span className="block text-[11px] text-muted">{r.target}</span>}
                   </span>
                 </li>
@@ -133,24 +167,20 @@ export default function LivePanel({
             </ul>
           )}
           {!ai && results.length === 0 && (
-            <p className="mt-5 border-t border-hairline pt-4 text-[14px] text-muted">
-              {hold ? 'Measurements show up once you are in position.' : 'Do a rep. Each one gets checked and scored.'}
+            <p className="mt-4 border-t border-rule pt-4 text-[14px] text-muted">
+              {hold ? 'Measurements show up once you are in position.' : 'Do a rep. Each one gets timed, checked and scored.'}
             </p>
           )}
         </section>
 
-        <section className="window flex min-h-[240px] flex-1 flex-col">
-          <div className="border-b border-hairline px-5 py-3">
-            <h2 className="text-[13px] font-medium">what wobbl said</h2>
+        <section className="panel flex min-h-[220px] flex-1 flex-col">
+          <div className="panel-bar">
+            <h2 className="text-[14px] font-medium">What wobbl said</h2>
           </div>
-          <ul className="feed-scroll max-h-[360px] flex-1 space-y-2.5 overflow-y-auto p-4" aria-live="polite">
+          <ul className="feed-scroll max-h-[340px] flex-1 space-y-2 overflow-y-auto p-4" aria-live="polite">
             {feed.length === 0 && (
-              <li className="flex flex-col items-center px-2 py-6 text-center text-[14px] text-muted">
-                <Wobbl size={44} />
-                <span className="mt-3 max-w-[16rem]">
-                  Quiet means nothing needs fixing yet. wobbl only speaks up when a mistake keeps
-                  showing up.
-                </span>
+              <li className="px-1 py-4 text-[14px] text-muted">
+                Quiet means nothing needs fixing yet. wobbl only speaks up when a mistake keeps showing up.
               </li>
             )}
             <AnimatePresence initial={false}>
@@ -158,19 +188,22 @@ export default function LivePanel({
                 <motion.li
                   key={item.id}
                   layout
-                  initial={{ opacity: 0, y: -10 }}
+                  initial={{ opacity: 0, y: -8 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.25 }}
-                  className={`rounded-xl border p-3 ${FEED_STYLE[item.kind]}`}
+                  transition={{ duration: 0.2 }}
+                  className="flex gap-3 border border-rule bg-white p-3"
                 >
-                  <p className="text-[15px] leading-snug">{item.text}</p>
-                  <p className="mt-1 flex justify-between text-[11px] text-muted">
-                    <span>
-                      {FEED_LABEL[item.kind]}
-                      {item.source === 'ai' ? ' (AI)' : ''}
-                    </span>
-                    <span className="font-mono">{item.time}</span>
-                  </p>
+                  <span className={`mt-1.5 h-2 w-2 shrink-0 ${FEED[item.kind].mark}`} aria-hidden="true" />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[15px] leading-snug">{item.text}</p>
+                    <p className="mt-1 flex justify-between text-[11px] text-muted">
+                      <span>
+                        {FEED[item.kind].label}
+                        {item.source === 'ai' ? ' (AI)' : ''}
+                      </span>
+                      <span className="tabular-nums">{item.time}</span>
+                    </p>
+                  </div>
                 </motion.li>
               ))}
             </AnimatePresence>
@@ -178,6 +211,50 @@ export default function LivePanel({
         </section>
       </div>
     </div>
+  );
+}
+
+function CameraCheck({ setup }) {
+  const failing = setup.items.filter((i) => !i.ok);
+  if (setup.ready) {
+    return (
+      <section className="panel flex items-center gap-3 px-5 py-3 text-[14px]">
+        <span className="flex h-5 w-5 items-center justify-center bg-cobalt text-white" aria-hidden="true">
+          <Check className="h-3.5 w-3.5" strokeWidth={3} />
+        </span>
+        <span className="font-medium">Camera check passed</span>
+        <span className="ml-auto text-right text-muted">
+          {[setup.items.find((i) => i.id === 'angle')?.value, setup.items.find((i) => i.id === 'tracking')?.value && `tracking ${setup.items.find((i) => i.id === 'tracking').value}`]
+            .filter(Boolean)
+            .join(', ')}
+        </span>
+      </section>
+    );
+  }
+  return (
+    <section className="panel" aria-live="polite">
+      <div className="panel-bar justify-between">
+        <h2 className="text-[14px] font-medium">Camera check</h2>
+        <span className="text-[13px] text-muted">
+          {setup.items.length - failing.length} of {setup.items.length} ok
+        </span>
+      </div>
+      <ul className="divide-y divide-rule px-5">
+        {setup.items.map((i) => (
+          <li key={i.id} className="flex items-center gap-3 py-2.5 text-[14px]">
+            <span
+              className={`flex h-5 w-5 shrink-0 items-center justify-center text-white ${i.ok ? 'bg-cobalt' : 'bg-signal'}`}
+              aria-label={i.ok ? 'ok' : 'needs fixing'}
+            >
+              {i.ok ? <Check className="h-3.5 w-3.5" strokeWidth={3} /> : <X className="h-3.5 w-3.5" strokeWidth={3} />}
+            </span>
+            <span className="flex-1">{i.label}</span>
+            <span className={i.ok ? 'text-muted' : 'text-signal'}>{i.value}</span>
+          </li>
+        ))}
+      </ul>
+      {failing[0]?.tip && <p className="border-t border-rule px-5 py-3 text-[14px]">{failing[0].tip}</p>}
+    </section>
   );
 }
 
@@ -191,7 +268,7 @@ function Stat({ label, value, suffix }) {
   return (
     <div>
       <p className="text-[13px] text-muted">{label}</p>
-      <p className="mt-1 text-4xl font-semibold tabular-nums tracking-tight">
+      <p className="display mt-1 text-4xl tabular-nums tracking-[-0.02em]">
         {value}
         {suffix && <span className="text-base font-normal text-muted">{suffix}</span>}
       </p>

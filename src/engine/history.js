@@ -15,7 +15,9 @@ export function loadSessions(storage = globalThis.localStorage) {
 export function saveSession(summary, storage = globalThis.localStorage) {
   // Too short to mean anything: don't clutter the history.
   if (!summary || (summary.reps === 0 && (summary.durationMs ?? 0) < 15000)) return loadSessions(storage);
-  const list = [...loadSessions(storage), { ...summary, savedAt: Date.now() }].slice(-MAX);
+  // Replays and second-by-second timelines are for this session's report only.
+  const { replay, timeline, ...kept } = summary;
+  const list = [...loadSessions(storage), { ...kept, savedAt: Date.now() }].slice(-MAX);
   try {
     storage?.setItem(KEY, JSON.stringify(list));
   } catch {

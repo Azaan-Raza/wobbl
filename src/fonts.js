@@ -1,5 +1,4 @@
-// Fonts ship with the site instead of loading from Google, so they render the
-// same everywhere and no third party sees the visit.
-import '@fontsource-variable/inter';
-import '@fontsource/caveat/700.css';
-import '@fontsource/geist-mono/400.css';
+// The one typeface, Archivo, ships with the site instead of loading from
+// Google, so it renders the same everywhere and no third party sees the visit.
+// The width axis is included: headlines are set slightly wide.
+import '@fontsource-variable/archivo/wdth.css';

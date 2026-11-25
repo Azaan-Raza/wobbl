@@ -1,39 +1,31 @@
 /** @type {import('tailwindcss').Config} */
+// wobbl brand tokens. BRAND.md explains each one.
 export default {
-  content: ['./index.html', './src/**/*.{js,jsx}'],
+  content: ['./index.html', './try/index.html', './src/**/*.{js,jsx}'],
   theme: {
     extend: {
       colors: {
-        paper: '#F5F5F5', // page background
-        ink: '#000000', // text and linework
-        graphite: '#303030', // dark pill buttons
-        line: '#626262', // button outlines
-        hairline: '#DCDCDC', // window borders and dividers
-        muted: '#5E5E5E', // secondary text (6:1 on paper)
-        chrome: '#ECECEC', // window title bars
-        stage: '#151515', // camera stage behind the video
-        accent: '#00E07A', // pose overlay and live indicators, used inside the product only
-        'accent-ink': '#007A3D', // accent when it has to sit on paper as text
+        paper: '#FFFFFF', // page background
+        ink: '#141414', // text, primary buttons
+        muted: '#5B5B58', // secondary text (6.8:1 on paper)
+        rule: '#E5E5E1', // borders and dividers
+        line: '#C9C9C4', // input borders, stronger dividers
+        mist: '#F4F4F1', // product stages, alternate bands
+        screen: '#141414', // behind live camera video
+        cobalt: { DEFAULT: '#2346F5', deep: '#1A36C4', wash: '#EEF1FE' }, // brand: tracked, in range, links
+        signal: { DEFAULT: '#D13A22', wash: '#FCEEEB' }, // the wobble: faults only
       },
       fontFamily: {
-        sans: ['"Inter Variable"', 'Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-        mono: ['"Geist Mono"', 'ui-monospace', 'SFMono-Regular', 'monospace'],
-        hand: ['Caveat', 'ui-rounded', 'cursive'], // handwritten notes only
+        sans: ['"Archivo Variable"', 'Archivo', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
       fontSize: {
-        hero: ['clamp(3rem, 8.2vw, 5.5rem)', { lineHeight: '0.95', letterSpacing: '-0.045em' }],
-        section: ['clamp(2.25rem, 5vw, 3.5rem)', { lineHeight: '1', letterSpacing: '-0.035em' }],
-        lead: ['1.25rem', { lineHeight: '1.6' }],
-      },
-      borderRadius: {
-        window: '16px',
-      },
-      boxShadow: {
-        float: '0 10px 24px 0 rgba(0, 0, 0, 0.12)',
-        window: '0 24px 60px -12px rgba(0, 0, 0, 0.18), 0 2px 6px rgba(0, 0, 0, 0.06)',
+        hero: ['clamp(2.6rem, 6.2vw, 4.25rem)', { lineHeight: '1.02', letterSpacing: '-0.03em' }],
+        section: ['clamp(2rem, 4.2vw, 3rem)', { lineHeight: '1.06', letterSpacing: '-0.025em' }],
+        lead: ['1.1875rem', { lineHeight: '1.55' }],
+        body: ['1.0625rem', { lineHeight: '1.6' }],
       },
       maxWidth: {
-        page: '72rem',
+        page: '75rem',
       },
     },
   },

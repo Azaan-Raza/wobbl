@@ -88,7 +88,7 @@ export class SessionRunner {
     for (const e of events) this.handle(e);
 
     const latest = this.coach?.latest;
-    this.draw(latest?.features?.pose ?? frame.pose, frame.hands, latest?.faultJoints ?? []);
+    this.draw(latest?.features?.pose ?? frame.pose, frame.hands, latest?.faultJoints ?? [], latest?.focus ?? null);
 
     if (now - (this.lastTickAt ?? 0) >= TICK_MS) {
       this.lastTickAt = now;
@@ -96,13 +96,13 @@ export class SessionRunner {
     }
   };
 
-  draw(pose, hands, faultJoints) {
+  draw(pose, hands, faultJoints, focus) {
     const { canvas, video } = this;
     if (canvas.width !== video.videoWidth) {
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
     }
-    drawOverlay(canvas.getContext('2d'), canvas.width, canvas.height, { pose, hands, faultJoints });
+    drawOverlay(canvas.getContext('2d'), canvas.width, canvas.height, { pose, hands, faultJoints, focus, mirrored: true });
   }
 
   stepAi(frame) {
@@ -144,7 +144,7 @@ export class SessionRunner {
   }
 
   handle(e) {
-    if (!this.muted && (e.type === 'cue' || e.type === 'praise' || e.type === 'hint')) {
+    if (!this.muted && ['cue', 'praise', 'hint', 'fatigue'].includes(e.type)) {
       if (e.type === 'cue') playCueChime();
       speak(e.text);
     }
@@ -160,6 +160,8 @@ export class SessionRunner {
     return {
       elapsedMs,
       tracking: Boolean(frame.pose) || frame.hands.length > 0,
+      setup: c.latest.setup,
+      set: c.sets.length,
       reps: c.reps.length,
       score: c.latest.score,
       results: c.latest.results,

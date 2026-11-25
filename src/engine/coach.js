@@ -1,6 +1,8 @@
 import { computeFeatures, isVisible } from './features.js';
 import { LandmarkSmoother } from './filters.js';
 import { HoldWindow, RepSegmenter } from './segment.js';
+import { repKinematics, spread, velocityLoss } from './kinematics.js';
+import { assessSetup } from './setup.js';
 import { median } from './math.js';
 
 const DEFAULTS = {
@@ -13,6 +15,10 @@ const DEFAULTS = {
   hintCooldownMs: 9000,
   missingMs: 1200,
   viewMs: 2000,
+  setGapMs: 20000, // a pause this long between reps starts a new set
+  fatigueLoss: 0.25, // velocity loss that triggers the "slowing down" note
+  timelineMs: 1000, // hold drills: how often to log the score for the report
+  maxTraces: 60, // reps kept for replay
 };
 
 // The coach turns frames into events. It knows nothing about cameras or the
@@ -24,6 +30,11 @@ const DEFAULTS = {
 //   { type: 'rep', index, score, results } a finished rep with every check
 //   { type: 'cue', id, text, joints }      one correction to say out loud
 //   { type: 'praise', id, text }           a cued fault that is now fixed
+//   { type: 'fatigue', text, loss }        reps in this set are slowing down
+//   { type: 'set', index }                 a long pause started a new set
+//
+// `latest` always holds the newest measurements, the camera check (`setup`)
+// and the angle to draw on the overlay (`focus`).
 export class Coach {
   constructor(drill, { settings = {}, smooth = true, ...options } = {}) {
     this.drill = drill;
@@ -52,8 +63,12 @@ export class Coach {
 
     this.holdTime = { total: 0, good: 0, byCheck: new Map() };
     this.stats = new Map(); // check id -> { label, target, faults, total, values }
+    this.sets = []; // rep drills: { index, reps, speeds, warned }
+    this.timeline = []; // hold drills: { s, score } once a second
+    this.lastTimelineAt = -Infinity;
+    this.badDistanceSince = null;
 
-    this.latest = { features: null, results: [], faultJoints: [], score: null };
+    this.latest = { features: null, results: [], faultJoints: [], score: null, setup: null, focus: null };
   }
 
   push(frame) {
@@ -67,7 +82,14 @@ export class Coach {
     const f = computeFeatures({ t, pose, world, hands: frame.hands });
     this.drill.derive?.(f, this.settings);
     this.latest.features = f;
+    this.latest.setup = assessSetup(f, this.drill, this.settings);
 
+    this.process(f, t, events);
+    this.latest.focus = this.focusOf(f);
+    return events;
+  }
+
+  process(f, t, events) {
     // 1. Can we see what this drill needs?
     const missing = this.missingParts(f);
     if (missing) {
@@ -76,16 +98,25 @@ export class Coach {
       this.segmenter?.push({ t }); // lets the segmenter notice the gap
       this.window.clear();
       this.latest.faultJoints = [];
-      return events;
+      return;
     }
     this.missingSince = null;
+
+    // Too far, too close or at the edge: say so, but keep coaching.
+    const distance = this.latest.setup.items.find((i) => i.id === 'distance');
+    if (distance && !distance.ok) {
+      this.badDistanceSince ??= t;
+      if (t - this.badDistanceSince >= this.opts.viewMs) this.hint(events, 'distance', distance.tip, t);
+    } else {
+      this.badDistanceSince = null;
+    }
 
     // 2. Is the camera at the right angle?
     if (this.drill.views && f.view && !this.drill.views.includes(f.view)) {
       this.wrongViewSince ??= t;
       if (t - this.wrongViewSince >= this.opts.viewMs) {
         this.hint(events, 'view', this.drill.viewHint, t);
-        return events;
+        return;
       }
     } else {
       this.wrongViewSince = null;
@@ -94,12 +125,23 @@ export class Coach {
     // 3. Baseline for drills that compare you to your own good posture.
     if (this.calibration && !this.baseline) {
       this.calibrate(f, t, events);
-      return events;
+      return;
     }
 
     if (this.drill.mode === 'rep') this.stepRep(f, t, events);
     else this.stepHold(f, t, events);
-    return events;
+  }
+
+  // The drill's main angle, drawn on the joint in the overlay: which three
+  // points, the measured value and whether the check it belongs to is off.
+  focusOf(f) {
+    const live = this.drill.live;
+    if (!live || !f.pose) return null;
+    const points = live.arc(f, this.settings);
+    const value = live.read(f, this.settings);
+    if (!points || value == null) return null;
+    const result = this.latest.results.find((r) => r.id === live.check);
+    return { points, value, fault: Boolean(result?.fault), label: live.label };
   }
 
   // `needs` lists pose landmarks that must be visible. An entry that is an
@@ -147,9 +189,34 @@ export class Coach {
     const results = this.evaluate(rep, rep.extreme.view ?? f.view);
     const score = scoreOf(results);
     const index = this.reps.length + 1;
-    this.reps.push({ index, score, results, at: t, duration: rep.duration });
+
+    // Sets: a long pause since the last rep starts a new one.
+    const prev = this.reps[this.reps.length - 1];
+    if (!prev || rep.movedAt - prev.end > this.opts.setGapMs) {
+      this.sets.push({ index: this.sets.length + 1, reps: 0, speeds: [], warned: false });
+      if (prev) events.push({ type: 'set', index: this.sets.length });
+    }
+    const set = this.sets[this.sets.length - 1];
+    const kin = repKinematics(rep, this.drill.rep);
+    set.reps += 1;
+    set.speeds.push(kin?.speed ?? null);
+    const loss = velocityLoss(set.speeds);
+
+    this.reps.push({
+      index,
+      set: set.index,
+      score,
+      results,
+      at: t,
+      end: rep.end,
+      duration: rep.duration,
+      kin,
+      loss,
+      faults: jointsOf(this.drill, results),
+      trace: this.reps.length < this.opts.maxTraces ? traceOf(rep) : null,
+    });
     this.record(results);
-    events.push({ type: 'rep', index, score, results });
+    events.push({ type: 'rep', index, score, results, set: set.index, kin, loss });
 
     for (const r of results) {
       if (r.skipped) continue;
@@ -166,7 +233,18 @@ export class Coach {
       return h.length >= 2 && !h[h.length - 1] && !h[h.length - 2];
     });
     this.latest = { ...this.latest, results, score, faultJoints: jointsOf(this.drill, results) };
-    this.speak(events, confirmed, fixed, t);
+
+    // Slowing down: the last two reps both lost a quarter of the set's best speed.
+    let fatigue = null;
+    if (this.drill.rep.fatigue && !set.warned && set.speeds.length >= 3) {
+      const valid = set.speeds.filter((s) => s > 0);
+      const best = Math.max(...valid);
+      const lastTwo = set.speeds.slice(-2);
+      if (lastTwo.every((s) => s > 0 && 1 - s / best >= this.opts.fatigueLoss)) {
+        fatigue = { set, loss };
+      }
+    }
+    this.speak(events, confirmed, fixed, t, fatigue);
   }
 
   stepHold(f, t, events) {
@@ -202,6 +280,10 @@ export class Coach {
       }
     }
     this.record(results, true);
+    if (score != null && t - this.lastTimelineAt >= this.opts.timelineMs && this.timeline.length < 7200) {
+      this.lastTimelineAt = t;
+      this.timeline.push({ s: Math.round((t - this.startedAt) / 100) / 10, score });
+    }
 
     const confirmed = results.filter(
       (r) => r.fault && t - (this.faultSince.get(r.id) ?? t) >= this.opts.persistMs
@@ -231,7 +313,7 @@ export class Coach {
 
   // Pick at most one thing to say: the most important confirmed fault that
   // isn't cooling down, otherwise praise for something just fixed.
-  speak(events, confirmed, fixed, t) {
+  speak(events, confirmed, fixed, t, fatigue = null) {
     if (t - this.lastSpokeAt < this.opts.minGapMs) return;
     const byId = (id) => this.drill.checks.find((c) => c.id === id);
 
@@ -243,6 +325,18 @@ export class Coach {
       this.cued.set(next.id, t);
       this.lastSpokeAt = t;
       events.push({ type: 'cue', id: next.id, text: check.cue, joints: check.joints || [] });
+      return;
+    }
+
+    if (fatigue) {
+      fatigue.set.warned = true;
+      this.lastSpokeAt = t;
+      events.push({
+        type: 'fatigue',
+        id: 'fatigue',
+        loss: fatigue.loss,
+        text: this.drill.rep.fatigueCue || 'Your reps are slowing down. Do one or two more, then rest.',
+      });
       return;
     }
 
@@ -285,11 +379,14 @@ export class Coach {
         if (!s) return null;
         const hold = this.holdTime.byCheck.get(c.id);
         const typical = median(s.values);
+        const sd = this.drill.mode === 'rep' ? spread(s.values) : null;
+        const spreadFormat = c.spreadFormat || (c.format ? null : (v) => `±${Math.round(v)}°`);
         return {
           id: c.id,
           label: c.label,
           target: c.target,
           typical: typical == null ? null : (c.format || formatDegrees)(typical),
+          spread: sd != null && spreadFormat ? spreadFormat(sd) : null,
           faultRate: this.drill.mode === 'hold'
             ? hold && hold.totalMs ? hold.faultMs / hold.totalMs : 0
             : s.total ? s.faults / s.total : 0,
@@ -308,8 +405,51 @@ export class Coach {
       bestScore: scores.length ? Math.max(...scores) : null,
       goodTimeShare: this.holdTime.total ? this.holdTime.good / this.holdTime.total : null,
       checks,
+      repLog: this.reps.map((r) => ({
+        index: r.index,
+        set: r.set,
+        score: r.score,
+        downMs: r.kin ? Math.round(r.kin.towardMs) : null,
+        pauseMs: r.kin ? Math.round(r.kin.holdMs) : null,
+        upMs: r.kin ? Math.round(r.kin.backMs) : null,
+        speed: r.kin?.speed != null ? Math.round(r.kin.speed) : null,
+        loss: r.loss != null ? Math.round(r.loss * 100) / 100 : null,
+        values: Object.fromEntries(
+          r.results.filter((x) => !x.skipped).map((x) => [x.id, Math.round(x.value * 100) / 100])
+        ),
+      })),
+      sets: this.sets.map((s) => ({ index: s.index, reps: s.reps, loss: velocityLoss(s.speeds) })),
+      timeline: this.timeline,
+      replay: this.replay(),
     };
   }
+
+  // Best and worst rep, for the side-by-side replay in the report.
+  replay() {
+    const traced = this.reps.filter((r) => r.trace?.frames.length && r.score != null);
+    if (!traced.length) return null;
+    const best = traced.reduce((a, b) => (b.score >= a.score ? b : a));
+    const worst = traced.reduce((a, b) => (b.score < a.score ? b : a));
+    const pack = (r) => ({ index: r.index, score: r.score, faults: r.faults, frames: r.trace.frames, bottom: r.trace.bottom });
+    return { best: pack(best), worst: worst.score < best.score ? pack(worst) : null };
+  }
+}
+
+// A rep's skeleton, every other frame, rounded, for replay.
+function traceOf(rep) {
+  const r = (v) => Math.round(v * 1000) / 1000;
+  const t0 = rep.frames[0].t;
+  const kept = rep.frames.filter((fr, i) => i % 2 === 0 && fr.pose);
+  const frames = kept.map((fr) => ({
+    t: Math.round(fr.t - t0),
+    p: fr.pose.map((pt) => [r(pt.x), r(pt.y), (pt.visibility ?? 0) >= 0.5 ? 1 : 0]),
+  }));
+  // Index of the kept frame closest to the bottom (or top) of the rep.
+  let bottom = 0;
+  kept.forEach((fr, i) => {
+    if (Math.abs(fr.t - rep.extreme.t) < Math.abs(kept[bottom].t - rep.extreme.t)) bottom = i;
+  });
+  return { frames, bottom };
 }
 
 function holdContext(window, baseline, settings) {

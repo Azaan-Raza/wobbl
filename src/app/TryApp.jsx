@@ -7,7 +7,7 @@ import DrillPicker from './DrillPicker.jsx';
 import SetupPanel from './SetupPanel.jsx';
 import LivePanel from './LivePanel.jsx';
 import Report from './Report.jsx';
-import Wobbl from '../components/Wobbl.jsx';
+import Logo from '../components/Logo.jsx';
 
 const defaultsFor = (drill) =>
   Object.fromEntries((drill.options || []).map((o) => [o.id, o.default]));
@@ -84,6 +84,12 @@ export default function TryApp() {
       case 'praise':
         add({ kind: 'praise', text: e.text });
         break;
+      case 'fatigue':
+        add({ kind: 'rest', text: e.text });
+        break;
+      case 'set':
+        add({ kind: 'note', text: `Set ${e.index} started after your rest.` });
+        break;
       case 'rep':
         setLastRep(e);
         break;
@@ -143,26 +149,20 @@ export default function TryApp() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-paper text-ink">
-      <header className="border-b border-hairline bg-paper">
-        <div className="flex items-center justify-between gap-4 px-5 py-3 sm:px-8">
-          <a href="../" className="flex items-center gap-1.5 text-[20px] font-bold tracking-[-0.05em]">
-            <Wobbl size={26} head />
-            wobbl
+    <div className="flex min-h-screen flex-col bg-mist text-ink">
+      <header className="border-b border-rule bg-white">
+        <div className="flex h-14 items-center justify-between gap-4 px-5 sm:px-8">
+          <a href="../" aria-label="wobbl home">
+            <Logo size={22} />
           </a>
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={toggleMute}
-              aria-pressed={muted}
-              className="inline-flex items-center gap-1.5 rounded-full border border-hairline px-3 py-1.5 text-sm text-muted transition-colors hover:border-line hover:text-ink"
-            >
-              {muted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
-              {muted ? 'voice off' : 'voice on'}
-            </button>
-            <a href="../" className="hidden rounded-full px-3 py-1.5 text-sm text-muted hover:text-ink sm:inline">
-              back to the site
+          <div className="flex items-center gap-4">
+            <a href="../" className="hidden text-sm text-muted hover:text-ink sm:inline">
+              Back to the site
             </a>
+            <button type="button" onClick={toggleMute} aria-pressed={!muted} className="btn-secondary btn-sm">
+              {muted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+              {muted ? 'Voice off' : 'Voice on'}
+            </button>
           </div>
         </div>
       </header>

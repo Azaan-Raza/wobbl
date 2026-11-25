@@ -14,6 +14,7 @@ export const deskPosture = {
   ],
   needs: [P.nose, P.leftShoulder, P.rightShoulder, [P.leftEar, P.rightEar]],
   missingHint: 'I lost you. Make sure your head and both shoulders are in frame.',
+  frame: 'upper',
   calibrate: {
     ms: 3000,
     keys: ['headHeight', 'neckLength', 'shoulderWidth'],

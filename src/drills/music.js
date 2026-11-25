@@ -27,6 +27,7 @@ export const piano = {
   options: [handOption('Hand to watch', 'right')],
   needsHands: (s) => [s.hand],
   missingHint: "I can't see your hand. Move the camera so it's in frame from the side.",
+  frame: 'hands',
   derive(f, s) {
     const hand = f.hands[s.hand];
     f.wristDrop = hand?.wristDrop ?? null;
@@ -88,6 +89,7 @@ export const guitar = {
   needs: (s) => [P.nose, P.leftShoulder, P.rightShoulder, s.hand === 'left' ? P.leftElbow : P.rightElbow],
   needsHands: (s) => [s.hand],
   missingHint: 'Move back so your head, shoulders and fretting hand are all in frame.',
+  frame: 'upper',
   calibrate: {
     ms: 3000,
     keys: ['headHeight', 'neckLength'],

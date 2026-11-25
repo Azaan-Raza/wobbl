@@ -71,5 +71,13 @@ export const HAND_BONES = [
   [0, 17],
 ];
 
+// Three-point joint angles by side, for drawing an angle on the overlay.
+// The middle point is the joint.
+export const ANGLES = {
+  knee: { L: [P.leftHip, P.leftKnee, P.leftAnkle], R: [P.rightHip, P.rightKnee, P.rightAnkle] },
+  elbow: { L: [P.leftShoulder, P.leftElbow, P.leftWrist], R: [P.rightShoulder, P.rightElbow, P.rightWrist] },
+  hip: { L: [P.leftShoulder, P.leftHip, P.leftKnee], R: [P.rightShoulder, P.rightHip, P.rightKnee] },
+};
+
 // Pose landmarks below this visibility are treated as not seen.
 export const MIN_VISIBILITY = 0.5;

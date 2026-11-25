@@ -159,3 +159,54 @@ export function shot({ knee = 130, flare = 0.1, bentArm = false, holdMs = 500 } 
     [500, () => frontShotPose()],
   ];
 }
+
+// Front view squat. Knee bend shows up as depth (z), as it would to a camera
+// in front. `shift` moves the hips sideways, in hip widths.
+export function frontSquatPose({ knee = 175, shift = 0 } = {}) {
+  const pose = blankPose();
+  const hw = 0.16;
+  const a = ((180 - knee) / 2) * RAD;
+  const ankleY = 0.92;
+  const kneeY = ankleY - 0.2 * Math.cos(a);
+  const hipY = kneeY - 0.2 * Math.cos(a);
+  const cx = 0.5 + shift * hw;
+  for (const [side, hip, k, ank, heel, foot, sh] of [
+    [-1, P.rightHip, P.rightKnee, P.rightAnkle, P.rightHeel, P.rightFoot, P.rightShoulder],
+    [1, P.leftHip, P.leftKnee, P.leftAnkle, P.leftHeel, P.leftFoot, P.leftShoulder],
+  ]) {
+    const hx = cx + (side * hw) / 2;
+    const ax = 0.5 + (side * hw) / 2;
+    pose[hip] = { x: hx, y: hipY, z: 0, visibility: 1 };
+    pose[k] = { x: (hx + ax) / 2, y: kneeY, z: -0.2 * Math.sin(a), visibility: 1 };
+    pose[ank] = { x: ax, y: ankleY, z: 0, visibility: 1 };
+    pose[heel] = { x: ax, y: ankleY + 0.01, z: 0.02, visibility: 1 };
+    pose[foot] = { x: ax + side * 0.01, y: ankleY + 0.02, z: -0.04, visibility: 1 };
+    pose[sh] = { x: cx + side * 0.12, y: hipY - 0.3, z: 0, visibility: 1 };
+  }
+  put(pose, P.nose, cx, hipY - 0.4);
+  return pose;
+}
+
+export function frontSquatRep(bottom, { ms = 2000, shift = 0 } = {}) {
+  return [
+    ms,
+    (p) => {
+      const d = Math.sin(p * Math.PI);
+      return frontSquatPose({ knee: 175 - (175 - bottom) * d, shift: shift * d });
+    },
+  ];
+}
+
+// A squat with separate down, pause and up phases, eased like a real rep.
+export function phasedRep({ down = 1200, pause = 0, up = 1200, bottom = 90 } = {}) {
+  const ease = (p) => (1 - Math.cos(p * Math.PI)) / 2;
+  const segs = [[down, (p) => sideSquatPose({ knee: 175 - (175 - bottom) * ease(p) })]];
+  if (pause) segs.push([pause, () => sideSquatPose({ knee: bottom })]);
+  segs.push([up, (p) => sideSquatPose({ knee: bottom + (175 - bottom) * ease(p) })]);
+  return segs;
+}
+
+// Moves every visible point: scale around a center, then shift.
+export function transform(pose, { scale = 1, cx = 0.5, cy = 0.9, dx = 0, dy = 0 } = {}) {
+  return pose.map((p) => ({ ...p, x: cx + (p.x - cx) * scale + dx, y: cy + (p.y - cy) * scale + dy }));
+}
