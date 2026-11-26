@@ -30,21 +30,21 @@ export const aiCoach = {
 export const PRODUCTS = [
   {
     id: 'sport',
-    name: 'sport',
+    name: 'wobbl Sport',
     status: 'Beta',
     line: 'Form checks for lifting, shooting and martial arts.',
     drills: [squat, jumpShot, frontStance, aiCoach],
   },
   {
     id: 'music',
-    name: 'music',
+    name: 'wobbl Music',
     status: 'Early access',
     line: 'Hand position and posture for piano and guitar.',
     drills: [piano, guitar],
   },
   {
     id: 'posture',
-    name: 'posture',
+    name: 'wobbl Posture',
     status: 'Early access',
     line: 'Keeps you from slouching while you study or work.',
     drills: [deskPosture],

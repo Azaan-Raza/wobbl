@@ -18,9 +18,9 @@ export default function DrillPicker({ products, current, onPick, locked }) {
               aria-selected={p.id === open}
               disabled={locked}
               onClick={() => setOpen(p.id)}
-              className="flex-1 capitalize disabled:opacity-40"
+              className="flex-1 disabled:opacity-40"
             >
-              {p.name}
+              {p.name.replace('wobbl ', '')}
             </button>
           ))}
         </div>
@@ -46,7 +46,7 @@ export default function DrillPicker({ products, current, onPick, locked }) {
         {products.map((p) => (
           <section key={p.id}>
             <div className="flex items-baseline justify-between gap-2 px-5">
-              <h2 className="display text-[19px] capitalize">{p.name}</h2>
+              <h2 className="display text-[19px]">{p.name}</h2>
               <span className="text-xs text-muted">{p.status}</span>
             </div>
             <ul className="mt-2 space-y-0.5 px-2">

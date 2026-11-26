@@ -40,9 +40,9 @@ Each backdrop is a sky, a low sun, five ridges of rolling hills and film grain, 
 | Dusk | Deep blue to peach | Hero |
 | Dawn | Lilac and pink | Camera check, closing call to action |
 | Day | Clear blue | During the set |
-| Ember | Plum to orange | Session report, wobbl for sport |
-| Night | Navy and violet | wobbl for music |
-| Sage | Soft green | wobbl for posture |
+| Ember | Plum to orange | Session report, wobbl Sport |
+| Night | Navy and violet | wobbl Music |
+| Sage | Soft green | wobbl Posture |
 
 Put product cards on top of backdrops, never text straight on a busy part of one. White text only goes on the dark top of a sky.
 

@@ -18,7 +18,7 @@ const QUESTIONS = [
     a: "Yes, with the AI coach, which works for any sport. It's slower and less exact than the drills that have their own rules.",
   },
   {
-    q: 'Is wobbl for posture medical advice?',
+    q: 'Is wobbl Posture medical advice?',
     a: "No. It tracks a habit: how you sit. If something hurts, see a doctor or a physical therapist.",
   },
   {

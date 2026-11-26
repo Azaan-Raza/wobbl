@@ -6,7 +6,7 @@ export default function SetupPanel({ drill, settings, onSettings, onStart, error
   return (
     <div className="panel mx-auto max-w-3xl">
       <div className="p-6 sm:p-10">
-        <p className="text-[14px] capitalize text-muted">{drill.product}</p>
+        <p className="text-[14px] text-muted">wobbl {drill.product[0].toUpperCase() + drill.product.slice(1)}</p>
         <h1 className="display mt-1 text-4xl tracking-[-0.02em] sm:text-5xl">{drill.name}</h1>
         <p className="mt-2 text-lg text-muted">{drill.blurb}</p>
 

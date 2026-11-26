@@ -6,9 +6,9 @@ The form coach that watches every rep.
 
 | Product | Status | Drills |
 | --- | --- | --- |
-| wobbl for sport | Beta | Squat, jump shot, Tae Kwon Do front stance, AI coach for any other sport |
-| wobbl for music | Early access | Piano hand position, guitar fretting hand |
-| wobbl for posture | Early access | Sitting at a desk |
+| wobbl Sport | Beta | Squat, jump shot, Tae Kwon Do front stance, AI coach for any other sport |
+| wobbl Music | Early access | Piano hand position, guitar fretting hand |
+| wobbl Posture | Early access | Sitting at a desk |
 
 ## How it works
 
