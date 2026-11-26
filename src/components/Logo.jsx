@@ -1,5 +1,6 @@
 // The wobbl mark: a lowercase w drawn the way the tracker draws a limb, as
-// bones between joints, on a cobalt square. The wordmark is Archivo, set wide.
+// bones between joints, on a rounded cobalt tile. The wordmark is set in
+// Instrument Sans, semibold, lowercase.
 export const W_POINTS = [
   [7, 10],
   [11.5, 22.5],
@@ -19,7 +20,7 @@ export function Mark({ size = 24, className = '', title }) {
       aria-hidden={title ? undefined : 'true'}
     >
       {title && <title>{title}</title>}
-      <rect width="32" height="32" fill="#2346F5" />
+      <rect width="32" height="32" rx="8" fill="#2346F5" />
       <polyline
         points={W_POINTS.map((p) => p.join(',')).join(' ')}
         fill="none"
@@ -35,11 +36,14 @@ export function Mark({ size = 24, className = '', title }) {
   );
 }
 
-export default function Logo({ size = 24, className = '' }) {
+export default function Logo({ size = 24, className = '', tone = 'ink' }) {
   return (
     <span className={`inline-flex items-center gap-2 ${className}`}>
       <Mark size={size} />
-      <span className="display text-[1.375rem] leading-none tracking-[-0.03em]" style={{ fontSize: size * 0.95 }}>
+      <span
+        className={`font-semibold leading-none tracking-[-0.035em] ${tone === 'white' ? 'text-white' : 'text-ink'}`}
+        style={{ fontSize: size * 0.92 }}
+      >
         wobbl
       </span>
     </span>

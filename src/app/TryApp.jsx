@@ -149,7 +149,7 @@ export default function TryApp() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-mist text-ink">
+    <div className="flex min-h-screen flex-col bg-[#F7F7F9] text-ink">
       <header className="border-b border-rule bg-white">
         <div className="flex h-14 items-center justify-between gap-4 px-5 sm:px-8">
           <a href="../" aria-label="wobbl home">

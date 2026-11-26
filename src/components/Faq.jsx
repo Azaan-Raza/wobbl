@@ -33,11 +33,11 @@ const QUESTIONS = [
 
 export default function Faq() {
   return (
-    <section id="faq" className="border-t border-rule px-5 py-24 sm:px-8 sm:py-32">
+    <section id="faq" className="px-5 py-24 sm:px-8 sm:py-32">
       <div className="mx-auto grid max-w-page grid-cols-[minmax(0,1fr)] gap-10 lg:grid-cols-12 lg:gap-10">
-        <h2 className="display text-section lg:col-span-4">Questions</h2>
+        <h2 className="display text-section lg:col-span-4">Questions, answered.</h2>
 
-        <div className="border-t border-ink lg:col-span-7 lg:col-start-6">
+        <div className="border-t border-rule lg:col-span-7 lg:col-start-6">
           {QUESTIONS.map(({ q, a }) => (
             <details key={q} className="group border-b border-rule">
               <summary className="flex cursor-pointer list-none items-center justify-between gap-6 py-5 text-lg font-medium [&::-webkit-details-marker]:hidden">
@@ -47,7 +47,7 @@ export default function Faq() {
                   aria-hidden="true"
                 />
               </summary>
-              <p className="max-w-xl pb-6 text-[17px] leading-relaxed text-muted">{a}</p>
+              <p className="max-w-xl pb-6 text-[16px] leading-relaxed text-muted">{a}</p>
             </details>
           ))}
         </div>

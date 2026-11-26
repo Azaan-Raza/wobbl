@@ -1,6 +1,6 @@
 # wobbl
 
-Your form, measured on every rep.
+The form coach that watches every rep.
 
 (Formerly Acuity Kinetic.) wobbl tracks your body (and hands, for music) in the browser, measures joint angles on every frame, checks each rep or held position against rules for that drill, and says one correction out loud when the same mistake keeps showing up.
 
@@ -52,7 +52,9 @@ src/engine/        pure logic, no DOM: runs the same in the browser and in tests
 src/drills/        one file per product; each drill is data plus small measure/fault functions
 src/tracking/      MediaPipe wrapper, overlay drawing, frame buffer for the AI coach
 src/app/           the app at /try/: picker, setup, live view, report, session runner
-src/components/    the marketing site; Logo.jsx holds the mark, figures.jsx the product drawings
+src/components/    the marketing site: Logo.jsx (the mark), Landscape.jsx (painted backdrops),
+                   LiveDemo.jsx (the hero demo, which runs the real Coach on generated motion)
+src/demo/motion.js the squat motion for the hero demo
 src/utils/exportSession.js   CSV and JSON export
 brand/             logo files (mark, lockups, outlined wordmark)
 api/coach.js       server function for the AI coach (holds the Gemini key)
@@ -81,7 +83,7 @@ Then add a synthetic test in `test/coach.test.js` that feeds good and bad versio
 
 ## Brand
 
-`BRAND.md` covers color, type, logo, components, layout and voice. The short version: white, flat and square, Archivo set wide for headlines, cobalt `#2346F5` for anything tracked or in range, and signal red `#D13A22` only for faults.
+`BRAND.md` covers color, type, logo, components, layout and voice. The short version: white pages with Newsreader serif headlines and Instrument Sans text, rounded cards and pill buttons, the product floating on painted skies, cobalt `#2346F5` for anything tracked or in range, and signal red `#D13A22` only for faults.
 
 ## Running it locally
 
@@ -91,10 +93,10 @@ You need Node 18 or newer.
 npm install
 cp .env.example .env   # paste your Gemini key into GEMINI_API_KEY (only the AI coach uses it)
 npm run dev            # site at http://localhost:5173, app at http://localhost:5173/try/
-npm test               # engine, coaching and camera-check tests (40)
+npm test               # engine, coaching, camera-check and homepage-demo tests (41)
 ```
 
-Use Chrome. The first session takes a few seconds while the tracking models download. The font (Archivo) is bundled, so nothing loads from Google Fonts.
+Use Chrome. The first session takes a few seconds while the tracking models download. The fonts (Newsreader and Instrument Sans) are bundled, so nothing loads from Google Fonts.
 
 ## Environment variables
 

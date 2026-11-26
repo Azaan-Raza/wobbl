@@ -7,7 +7,7 @@ export default function DrillPicker({ products, current, onPick, locked }) {
   const openProduct = products.find((p) => p.id === open) || products[0];
 
   return (
-    <nav aria-label="Drills" className="border-b border-rule bg-white lg:border-b-0 lg:border-r">
+    <nav aria-label="Drills" className="border-b border-rule bg-white lg:min-h-[calc(100vh-3.5rem)] lg:border-b-0 lg:border-r">
       <div className="px-4 py-4 lg:hidden">
         <div className="segmented" role="tablist" aria-label="Products">
           {products.map((p) => (
@@ -32,8 +32,8 @@ export default function DrillPicker({ products, current, onPick, locked }) {
               disabled={locked && d.id !== current.id}
               onClick={() => onPick(d)}
               aria-current={d.id === current.id ? 'page' : undefined}
-              className={`border px-3 py-1.5 text-sm transition-colors disabled:opacity-40 ${
-                d.id === current.id ? 'border-ink bg-ink text-white' : 'border-rule bg-white hover:border-ink'
+              className={`rounded-full border px-3.5 py-1.5 text-sm transition-colors disabled:opacity-40 ${
+                d.id === current.id ? 'border-ink bg-ink text-white' : 'border-rule bg-white hover:border-ink/40'
               }`}
             >
               {d.name}
@@ -46,10 +46,10 @@ export default function DrillPicker({ products, current, onPick, locked }) {
         {products.map((p) => (
           <section key={p.id}>
             <div className="flex items-baseline justify-between gap-2 px-5">
-              <h2 className="text-[14px] font-semibold capitalize">{p.name}</h2>
+              <h2 className="display text-[19px] capitalize">{p.name}</h2>
               <span className="text-xs text-muted">{p.status}</span>
             </div>
-            <ul className="mt-2">
+            <ul className="mt-2 space-y-0.5 px-2">
               {p.drills.map((d) => {
                 const active = d.id === current.id;
                 return (
@@ -59,8 +59,8 @@ export default function DrillPicker({ products, current, onPick, locked }) {
                       disabled={locked && !active}
                       onClick={() => onPick(d)}
                       aria-current={active ? 'page' : undefined}
-                      className={`w-full border-l-2 px-5 py-2.5 text-left transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
-                        active ? 'border-cobalt bg-cobalt-wash' : 'border-transparent hover:bg-mist'
+                      className={`w-full rounded-xl px-3 py-2.5 text-left transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
+                        active ? 'bg-cobalt-wash' : 'hover:bg-mist'
                       }`}
                     >
                       <span className="block text-[15px] font-medium">{d.name}</span>

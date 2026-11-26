@@ -58,14 +58,14 @@ export default function LivePanel({ drill, videoRef, canvasRef, status, snap, la
 
           {!status && snap && (
             <div className="absolute left-3 top-3 flex flex-wrap gap-1.5 text-[12px] font-medium">
-              <span className="flex items-center gap-1.5 bg-ink/90 px-2 py-1 text-white">
-                <span className="h-1.5 w-1.5 bg-signal" aria-hidden="true" />
+              <span className="glass flex items-center gap-1.5 rounded-full px-2.5 py-1 text-white">
+                <span className="h-1.5 w-1.5 rounded-full bg-signal-bright" aria-hidden="true" />
                 Live
               </span>
               {view && view !== 'unknown' && (
-                <span className="bg-white/90 px-2 py-1 text-ink">{view[0].toUpperCase() + view.slice(1)}</span>
+                <span className="glass rounded-full px-2.5 py-1 text-white">{view[0].toUpperCase() + view.slice(1)}</span>
               )}
-              {tracking && <span className="bg-white/90 px-2 py-1 text-ink">Tracking {tracking}</span>}
+              {tracking && <span className="glass rounded-full px-2.5 py-1 text-white">Tracking {tracking}</span>}
             </div>
           )}
 
@@ -76,16 +76,16 @@ export default function LivePanel({ drill, videoRef, canvasRef, status, snap, la
           )}
 
           {calibration != null && (
-            <div className="absolute inset-x-0 bottom-0 bg-ink/85 px-5 py-4 text-white">
+            <div className="glass absolute inset-x-3 bottom-3 rounded-2xl px-5 py-4 text-white">
               <p className="text-sm font-medium">Hold your best posture. Saving your baseline…</p>
-              <div className="mt-2 h-1 bg-white/20">
+              <div className="mt-2 h-1 overflow-hidden rounded-full bg-white/20">
                 <div className="h-full bg-cobalt" style={{ width: `${Math.round(calibration * 100)}%` }} />
               </div>
             </div>
           )}
 
           {lost && !status && (
-            <p className="absolute left-1/2 top-3 -translate-x-1/2 bg-ink/90 px-3 py-1 text-xs font-medium text-white">
+            <p className="glass absolute left-1/2 top-3 -translate-x-1/2 rounded-full px-3 py-1 text-xs font-medium text-white">
               Can't see you right now
             </p>
           )}
@@ -123,13 +123,13 @@ export default function LivePanel({ drill, videoRef, canvasRef, status, snap, la
           </div>
 
           {!hold && !ai && lastRep?.kin && (
-            <div className="mt-4 grid grid-cols-3 border-y border-rule text-[13px]">
+            <div className="mt-4 grid grid-cols-3 rounded-xl bg-mist px-3 text-[13px]">
               {[
                 [phases[0], lastRep.kin.towardMs],
                 [phases[1], lastRep.kin.holdMs],
                 [phases[2], lastRep.kin.backMs],
               ].map(([label, ms]) => (
-                <div key={label} className="border-r border-rule py-2 pl-0 pr-2 last:border-r-0 [&:not(:first-child)]:pl-3">
+                <div key={label} className="py-2.5 pr-2 [&:not(:first-child)]:pl-3">
                   <p className="capitalize text-muted">{label}</p>
                   <p className="mt-0.5 text-[15px] tabular-nums">{secs(ms)}</p>
                 </div>
@@ -150,7 +150,7 @@ export default function LivePanel({ drill, videoRef, canvasRef, status, snap, la
               {results.map((r) => (
                 <li key={r.id} className="flex items-center gap-3 py-2.5 text-[14px]">
                   <span
-                    className={`h-2 w-2 shrink-0 ${r.skipped ? 'bg-rule' : r.fault ? 'bg-signal' : 'bg-cobalt'}`}
+                    className={`h-2 w-2 shrink-0 rounded-full ${r.skipped ? 'bg-rule' : r.fault ? 'bg-signal' : 'bg-cobalt'}`}
                     aria-label={r.skipped ? 'not checked' : r.fault ? 'off' : 'in range'}
                   />
                   <span className="min-w-0 flex-1">{r.label}</span>
@@ -191,9 +191,9 @@ export default function LivePanel({ drill, videoRef, canvasRef, status, snap, la
                   initial={{ opacity: 0, y: -8 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.2 }}
-                  className="flex gap-3 border border-rule bg-white p-3"
+                  className="flex gap-3 rounded-xl border border-rule bg-white p-3"
                 >
-                  <span className={`mt-1.5 h-2 w-2 shrink-0 ${FEED[item.kind].mark}`} aria-hidden="true" />
+                  <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${FEED[item.kind].mark}`} aria-hidden="true" />
                   <div className="min-w-0 flex-1">
                     <p className="text-[15px] leading-snug">{item.text}</p>
                     <p className="mt-1 flex justify-between text-[11px] text-muted">
@@ -219,7 +219,7 @@ function CameraCheck({ setup }) {
   if (setup.ready) {
     return (
       <section className="panel flex items-center gap-3 px-5 py-3 text-[14px]">
-        <span className="flex h-5 w-5 items-center justify-center bg-cobalt text-white" aria-hidden="true">
+        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-cobalt text-white" aria-hidden="true">
           <Check className="h-3.5 w-3.5" strokeWidth={3} />
         </span>
         <span className="font-medium">Camera check passed</span>
@@ -243,7 +243,7 @@ function CameraCheck({ setup }) {
         {setup.items.map((i) => (
           <li key={i.id} className="flex items-center gap-3 py-2.5 text-[14px]">
             <span
-              className={`flex h-5 w-5 shrink-0 items-center justify-center text-white ${i.ok ? 'bg-cobalt' : 'bg-signal'}`}
+              className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-white ${i.ok ? 'bg-cobalt' : 'bg-signal'}`}
               aria-label={i.ok ? 'ok' : 'needs fixing'}
             >
               {i.ok ? <Check className="h-3.5 w-3.5" strokeWidth={3} /> : <X className="h-3.5 w-3.5" strokeWidth={3} />}
@@ -268,7 +268,7 @@ function Stat({ label, value, suffix }) {
   return (
     <div>
       <p className="text-[13px] text-muted">{label}</p>
-      <p className="display mt-1 text-4xl tabular-nums tracking-[-0.02em]">
+      <p className="display mt-1 text-[2.75rem] leading-none tabular-nums tracking-[-0.02em]">
         {value}
         {suffix && <span className="text-base font-normal text-muted">{suffix}</span>}
       </p>

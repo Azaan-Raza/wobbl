@@ -19,7 +19,7 @@ export default function Toast({ toast }) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 16 }}
             transition={{ duration: 0.2, ease: 'easeOut' }}
-            className={`pointer-events-auto px-5 py-3 text-sm font-medium ${
+            className={`pointer-events-auto rounded-full px-5 py-3 text-sm font-medium shadow-lift ${
               toast.type === 'error' ? 'border border-signal bg-white text-signal' : 'bg-ink text-white'
             }`}
           >

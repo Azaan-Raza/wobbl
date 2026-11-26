@@ -26,7 +26,7 @@ export default function Report({ drill, summary, history, onAgain, onBack }) {
     <div className="mx-auto max-w-4xl space-y-5">
       <div className="panel p-6 sm:p-10">
         <p className="text-[14px] text-muted">Session report, {drill.name}</p>
-        <h1 className="display mt-1 text-3xl tracking-[-0.02em] sm:text-4xl">{headline(summary)}</h1>
+        <h1 className="display mt-1 text-4xl tracking-[-0.02em] sm:text-5xl">{headline(summary)}</h1>
 
         <dl className="mt-8 grid grid-cols-2 gap-6 border-y border-rule py-6 sm:grid-cols-4">
           <Fact label="Time" value={minutes(summary.durationMs)} />
@@ -206,7 +206,7 @@ function Fact({ label, value }) {
   return (
     <div>
       <dt className="text-[13px] text-muted">{label}</dt>
-      <dd className="display mt-1 text-2xl tabular-nums">{value}</dd>
+      <dd className="display mt-1 text-[2rem] leading-none tabular-nums">{value}</dd>
     </div>
   );
 }
@@ -254,7 +254,7 @@ function Bars({ values, max, bad, unit, label }) {
           return (
             <g key={i} onMouseEnter={() => setHover(i)} onMouseLeave={() => setHover(null)}>
               <rect x={pad.l + slot * i} y={pad.t} width={slot} height={height - pad.t - pad.b} fill="transparent" />
-              <rect x={x} y={y(v)} width={barW} height={Math.max(1, y(0) - y(v))} fill={bad(v, i) ? '#D13A22' : '#2346F5'} opacity={hover == null || hover === i ? 1 : 0.45} />
+              <rect x={x} y={y(v)} width={barW} height={Math.max(1, y(0) - y(v))} rx={Math.min(4, barW / 2)} fill={bad(v, i) ? '#D13A22' : '#2346F5'} opacity={hover == null || hover === i ? 1 : 0.45} />
               {i % step === 0 && (
                 <text x={x + barW / 2} y={height - 6} textAnchor="middle" fontSize="11" fill="#5B5B58">
                   {i + 1}
@@ -266,7 +266,7 @@ function Bars({ values, max, bad, unit, label }) {
       </svg>
       {hover != null && values[hover] != null && (
         <div
-          className="pointer-events-none absolute border border-rule bg-white px-2 py-1 text-[12px] shadow-sm"
+          className="pointer-events-none absolute rounded-lg border border-rule bg-white px-2 py-1 text-[12px] shadow-soft"
           style={{ left: Math.min(width - 120, pad.l + slot * hover), top: 0 }}
         >
           {label(hover)}: <span className="font-medium tabular-nums">{values[hover]}{unit}</span>
@@ -322,7 +322,7 @@ function Timeline({ points }) {
         )}
       </svg>
       {hover != null && (
-        <div className="pointer-events-none absolute border border-rule bg-white px-2 py-1 text-[12px]" style={{ left: Math.min(width - 110, x(points[hover].s) + 8), top: 0 }}>
+        <div className="pointer-events-none absolute rounded-lg border border-rule bg-white px-2 py-1 text-[12px] shadow-soft" style={{ left: Math.min(width - 110, x(points[hover].s) + 8), top: 0 }}>
           {minutes(points[hover].s * 1000)}: <span className="font-medium tabular-nums">{points[hover].score}</span>
         </div>
       )}

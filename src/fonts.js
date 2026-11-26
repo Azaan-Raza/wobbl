@@ -1,4 +1,5 @@
-// The one typeface, Archivo, ships with the site instead of loading from
-// Google, so it renders the same everywhere and no third party sees the visit.
-// The width axis is included: headlines are set slightly wide.
-import '@fontsource-variable/archivo/wdth.css';
+// Two families, bundled with the site so nothing loads from Google:
+// Newsreader (a serif with optical sizes) for headlines and big numbers, and
+// Instrument Sans for everything else.
+import '@fontsource-variable/newsreader/opsz.css';
+import '@fontsource-variable/instrument-sans/wdth.css';

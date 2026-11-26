@@ -7,14 +7,14 @@ export default function SetupPanel({ drill, settings, onSettings, onStart, error
     <div className="panel mx-auto max-w-3xl">
       <div className="p-6 sm:p-10">
         <p className="text-[14px] capitalize text-muted">{drill.product}</p>
-        <h1 className="display mt-1 text-3xl tracking-[-0.02em] sm:text-4xl">{drill.name}</h1>
+        <h1 className="display mt-1 text-4xl tracking-[-0.02em] sm:text-5xl">{drill.name}</h1>
         <p className="mt-2 text-lg text-muted">{drill.blurb}</p>
 
         <h2 className="mt-9 text-[15px] font-semibold">Before you start</h2>
         <ol className="mt-3 space-y-3">
           {drill.setup.map((step, i) => (
             <li key={step} className="flex gap-3 text-[16px] leading-relaxed">
-              <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center border border-line text-xs font-medium tabular-nums">
+              <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-mist text-xs font-medium tabular-nums">
                 {i + 1}
               </span>
               <span>{step}</span>
@@ -36,7 +36,7 @@ export default function SetupPanel({ drill, settings, onSettings, onStart, error
               id={`opt-${opt.id}`}
               value={settings[opt.id]}
               onChange={(e) => onSettings({ ...settings, [opt.id]: e.target.value })}
-              className="field mt-2 block w-auto min-w-[12rem] cursor-pointer"
+              className="field mt-2 block w-auto min-w-[12rem] cursor-pointer appearance-auto"
             >
               {opt.choices.map(([value, label]) => (
                 <option key={value} value={value}>
@@ -75,7 +75,7 @@ export default function SetupPanel({ drill, settings, onSettings, onStart, error
           </p>
         </div>
         {error && (
-          <p role="alert" className="mt-5 border border-signal bg-signal-wash px-4 py-3 text-[15px] text-ink">
+          <p role="alert" className="mt-5 rounded-xl border border-signal/40 bg-signal-wash px-4 py-3 text-[15px] text-ink">
             {error}
           </p>
         )}
@@ -98,7 +98,7 @@ export function Trend({ scores }) {
         <div key={i} className="flex flex-1 flex-col items-center justify-end gap-1">
           <span className="text-[11px] tabular-nums text-muted">{s}</span>
           <div
-            className={`w-full max-w-[28px] ${i === scores.length - 1 ? 'bg-cobalt' : 'bg-line'}`}
+            className={`w-full max-w-[28px] rounded-md ${i === scores.length - 1 ? 'bg-cobalt' : 'bg-line'}`}
             style={{ height: `${Math.max(4, s * 0.6)}px` }}
             title={`Session ${i + 1}: ${s}`}
           />

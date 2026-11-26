@@ -34,15 +34,15 @@ export default function FounderNote({ showToast }) {
   };
 
   return (
-    <section id="waitlist" className="border-t border-rule px-5 py-24 sm:px-8 sm:py-32">
+    <section id="waitlist" className="bg-night px-5 py-24 text-white sm:px-8 sm:py-32">
       <div className="mx-auto grid max-w-page grid-cols-[minmax(0,1fr)] gap-12 lg:grid-cols-12 lg:gap-10">
         <div className="lg:col-span-4">
-          <p className="text-[15px] text-muted">A note from the founder</p>
+          <p className="text-[15px] text-white/55">A note from the founder</p>
           <h2 className="display mt-3 text-section">Hey, I'm Azaan.</h2>
         </div>
 
         <div className="lg:col-span-7 lg:col-start-6">
-          <div className="space-y-5 text-[1.1875rem] leading-relaxed">
+          <div className="display space-y-5 text-[1.5rem] leading-[1.45] text-white/85 sm:text-[1.625rem]">
             <p>
               I'm a sophomore in high school and I've played sports my whole life: basketball, Tae
               Kwon Do, soccer, tennis, swimming, you name it. So many times I'd walk off the court or
@@ -59,9 +59,9 @@ export default function FounderNote({ showToast }) {
           </div>
 
           <p className="mt-8 font-semibold">Azaan</p>
-          <p className="text-[15px] text-muted">Founder, wobbl</p>
+          <p className="text-[15px] text-white/55">Founder, wobbl</p>
 
-          <div className="mt-12 border border-rule p-6 sm:p-8">
+          <div className="mt-12 rounded-card bg-white/[0.06] p-6 ring-1 ring-white/10 sm:p-8">
             {joined ? (
               <p className="text-lg">
                 You're on the list. I'll email you when your spot opens, and your first month of Pro is on
@@ -72,9 +72,9 @@ export default function FounderNote({ showToast }) {
                 <p className="text-lg font-medium">
                   Sign up for the waitlist and I'll give you a month of Pro free when we launch.
                 </p>
-                <p className="mt-1 text-[15px] text-muted">No credit card needed. You'll get one email when your spot opens.</p>
+                <p className="mt-1 text-[15px] text-white/60">No credit card needed. You'll get one email when your spot opens.</p>
 
-                <form onSubmit={submit} className="mt-6 flex flex-col gap-3 sm:flex-row sm:gap-0">
+                <form onSubmit={submit} className="mt-6 flex flex-col gap-3 sm:flex-row sm:gap-2">
                   <label htmlFor="waitlist-email" className="sr-only">
                     Email address
                   </label>
@@ -86,9 +86,9 @@ export default function FounderNote({ showToast }) {
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="you@example.com"
                     disabled={submitting}
-                    className="field flex-1"
+                    className="field flex-1 border-white/15 bg-white/10 text-white placeholder:text-white/45 focus:border-white/60"
                   />
-                  <button type="submit" disabled={submitting} className="btn-primary">
+                  <button type="submit" disabled={submitting} className="btn-accent">
                     {submitting ? 'Adding you…' : 'Join the waitlist'}
                   </button>
                 </form>
